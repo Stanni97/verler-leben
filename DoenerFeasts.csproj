@@ -73,7 +73,7 @@
 {
   "name": "DoenerFeasts",
   "version_number": "$(Version)",
-  "website_url": "https://github.com/Stanni97/valheim-doener-feasts",
+  "website_url": "https://github.com/Stanni97/verler-leben",
   "description": "Spexarder Pizza and Kaunitzer Teller: two baked Doener feasts for the Feaster, with lots of health and stamina.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2333",

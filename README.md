@@ -54,7 +54,7 @@ Im **Multiplayer** müssen alle Spieler und der Server den Mod in derselben Vers
 
 ## Installation
 
-Die fertige Mod ist ein Zip `DoenerFeasts-<version>.zip` mit `plugins/DoenerFeasts.dll` sowie `manifest.json` und `icon.png` für Mod-Manager. Du bekommst es von der [Release-Seite](https://github.com/Stanni97/valheim-doener-feasts/releases/latest) oder baust es selbst (siehe [Selbst bauen](#selbst-bauen), das Zip landet dann in `dist/`).
+Die fertige Mod ist ein Zip `DoenerFeasts-<version>.zip` mit `plugins/DoenerFeasts.dll` sowie `manifest.json` und `icon.png` für Mod-Manager. Du bekommst es von der [Release-Seite](https://github.com/Stanni97/verler-leben/releases/latest) oder baust es selbst (siehe [Selbst bauen](#selbst-bauen), das Zip landet dann in `dist/`).
 
 ### Mit Mod-Manager (Windows und Linux)
 
@@ -131,8 +131,8 @@ Du brauchst:
 - Valheim mit installiertem BepInExPack und Jotunn. Der Build verwendet die DLLs direkt aus dem Spielordner. NuGet-Pakete werden dabei nicht heruntergeladen.
 
 ```bash
-git clone https://github.com/Stanni97/valheim-doener-feasts.git
-cd valheim-doener-feasts
+git clone https://github.com/Stanni97/verler-leben.git
+cd verler-leben
 dotnet build -c Release
 ```
 
