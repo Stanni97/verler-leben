@@ -10,16 +10,16 @@ using Jotunn.Managers;
 using Jotunn.Utils;
 using UnityEngine;
 
-namespace DoenerFeasts
+namespace VerlerLeben
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(Jotunn.Main.ModGuid)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
-    internal class DoenerFeastsPlugin : BaseUnityPlugin
+    internal class VerlerLebenPlugin : BaseUnityPlugin
     {
-        public const string PluginGUID = "felix.doenerfeasts";
-        public const string PluginName = "Doener Feasts";
-        // Keep in sync with <Version> in DoenerFeasts.csproj.
+        public const string PluginGUID = "felix.verlerleben";
+        public const string PluginName = "Verler Leben";
+        // Keep in sync with <Version> in VerlerLeben.csproj.
         public const string PluginVersion = "1.0.0";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.

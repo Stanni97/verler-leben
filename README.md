@@ -1,6 +1,6 @@
-# Döner Feasts für Valheim
+# Verler Leben
 
-Ein Valheim-Mod mit zwei Festmahlen (Feasts) für den Servierteller: der **Spexarder Pizza** und dem **Kaunitzer Teller**. Beide stammen aus der Dönerbude um die Ecke, beide müssen im Steinofen gebacken werden, und beide geben richtig viel Leben und Ausdauer.
+**Verler Leben** ist ein Valheim-Mod mit zwei Festmahlen (Feasts) für den Servierteller: der **Spexarder Pizza** und dem **Kaunitzer Teller**. Beide stammen aus der Dönerbude um die Ecke, beide müssen im Steinofen gebacken werden, und beide geben richtig viel Leben und Ausdauer.
 
 <p>
   <img src="Assets/pizza.png" width="96" alt="Spexarder Pizza">
@@ -54,7 +54,7 @@ Im **Multiplayer** müssen alle Spieler und der Server den Mod in derselben Vers
 
 ## Installation
 
-Die fertige Mod ist ein Zip `DoenerFeasts-<version>.zip` mit `plugins/DoenerFeasts.dll` sowie `manifest.json` und `icon.png` für Mod-Manager. Du bekommst es von der [Release-Seite](https://github.com/Stanni97/verler-leben/releases/latest) oder baust es selbst (siehe [Selbst bauen](#selbst-bauen), das Zip landet dann in `dist/`).
+Die fertige Mod ist ein Zip `VerlerLeben-<version>.zip` mit `plugins/VerlerLeben.dll` sowie `manifest.json` und `icon.png` für Mod-Manager. Du bekommst es von der [Release-Seite](https://github.com/Stanni97/verler-leben/releases/latest) oder baust es selbst (siehe [Selbst bauen](#selbst-bauen), das Zip landet dann in `dist/`).
 
 ### Mit Mod-Manager (Windows und Linux)
 
@@ -69,7 +69,7 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
 1. Den Valheim-Ordner öffnen: in Steam Rechtsklick auf Valheim → **Verwalten** → **Lokale Dateien durchsuchen**.
 2. **BepInExPack_Valheim** herunterladen und den *Inhalt* des Ordners `BepInExPack_Valheim` aus der Zip direkt in den Valheim-Ordner kopieren. Danach liegen `BepInEx\`, `winhttp.dll` und `doorstop_config.ini` neben `valheim.exe`.
 3. **Jotunn** herunterladen und `plugins\Jotunn.dll` nach `BepInEx\plugins\` kopieren.
-4. Den Ordner `BepInEx\plugins\DoenerFeasts\` anlegen und `DoenerFeasts.dll` hineinkopieren.
+4. Den Ordner `BepInEx\plugins\VerlerLeben\` anlegen und `VerlerLeben.dll` hineinkopieren.
 5. Valheim ganz normal über Steam starten. Unter Windows sind keine Startoptionen nötig.
 
 ### Manuell unter Linux (native Steam-Version)
@@ -79,7 +79,7 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
    ```bash
    chmod +x start_game_bepinex.sh
    ```
-3. Jotunn und `DoenerFeasts.dll` wie unter Windows ablegen: `BepInEx/plugins/Jotunn.dll` und `BepInEx/plugins/DoenerFeasts/DoenerFeasts.dll`.
+3. Jotunn und `VerlerLeben.dll` wie unter Windows ablegen: `BepInEx/plugins/Jotunn.dll` und `BepInEx/plugins/VerlerLeben/VerlerLeben.dll`.
 4. In Steam Rechtsklick auf Valheim → **Eigenschaften** → **Startoptionen**:
    ```
    ./start_game_bepinex.sh %command%
@@ -90,7 +90,7 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
 
 ### Dedicated Server
 
-`BepInExPack_Valheim`, `Jotunn.dll` und `DoenerFeasts/DoenerFeasts.dll` auf dem Server genauso ablegen. Unter Linux startest du den Server mit `start_server_bepinex.sh`, unter Windows ganz normal.
+`BepInExPack_Valheim`, `Jotunn.dll` und `VerlerLeben/VerlerLeben.dll` auf dem Server genauso ablegen. Unter Linux startest du den Server mit `start_server_bepinex.sh`, unter Windows ganz normal.
 
 ### Funktioniert es?
 
@@ -101,7 +101,7 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
 
 ## Konfiguration
 
-Nach dem ersten Start mit dem Mod liegt die Datei `BepInEx/config/felix.doenerfeasts.cfg` im Valheim-Ordner. Änderungen greifen nach einem Neustart des Spiels.
+Nach dem ersten Start mit dem Mod liegt die Datei `BepInEx/config/felix.verlerleben.cfg` im Valheim-Ordner. Änderungen greifen nach einem Neustart des Spiels.
 
 Die Abschnitte `[Teller]` und `[Pizza]` (die Feasts):
 
@@ -136,7 +136,7 @@ cd verler-leben
 dotnet build -c Release
 ```
 
-Der Build kopiert `DoenerFeasts.dll` automatisch nach `BepInEx/plugins/DoenerFeasts/` und legt das Release-Zip unter `dist/` ab.
+Der Build kopiert `VerlerLeben.dll` automatisch nach `BepInEx/plugins/VerlerLeben/` und legt das Release-Zip unter `dist/` ab.
 
 Liegt Valheim nicht im Standard-Steam-Ordner, gibst du den Pfad mit:
 
@@ -146,7 +146,7 @@ dotnet build -c Release -p:ValheimDir="D:\SteamLibrary\steamapps\common\Valheim"
 
 Das automatische Kopieren ins Spiel schaltest du mit `-p:InstallToGame=false` ab.
 
-Bei einer neuen Version die Versionsnummer an zwei Stellen erhöhen: `<Version>` in `DoenerFeasts.csproj` und `PluginVersion` in `src/DoenerFeastsPlugin.cs`.
+Bei einer neuen Version die Versionsnummer an zwei Stellen erhöhen: `<Version>` in `VerlerLeben.csproj` und `PluginVersion` in `src/VerlerLebenPlugin.cs`.
 
 Die Icons erzeugt `tools/make_icons.py` (Python 3 mit Pillow):
 

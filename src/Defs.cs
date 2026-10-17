@@ -1,7 +1,7 @@
 using BepInEx.Configuration;
 using Jotunn.Configs;
 
-namespace DoenerFeasts
+namespace VerlerLeben
 {
     /// <summary>
     /// A plain ingredient (Döner meat, cheese). Field initialisers are the defaults;
@@ -21,7 +21,7 @@ namespace DoenerFeasts
         public int Amount = 1;
 
         public string Token => "df_" + Key.ToLowerInvariant();
-        public string IconResource => $"DoenerFeasts.{Key.ToLowerInvariant()}.png";
+        public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
 
         public void Bind(ConfigFile config)
         {
@@ -56,8 +56,8 @@ namespace DoenerFeasts
         public int Servings = 10;
 
         public string Token => "df_" + Key.ToLowerInvariant();
-        public string RawIconResource => $"DoenerFeasts.{Key.ToLowerInvariant()}raw.png";
-        public string IconResource => $"DoenerFeasts.{Key.ToLowerInvariant()}.png";
+        public string RawIconResource => $"VerlerLeben.{Key.ToLowerInvariant()}raw.png";
+        public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
 
         public void Bind(ConfigFile config)
         {

@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>DoenerFeasts</AssemblyName>
-    <RootNamespace>DoenerFeasts</RootNamespace>
-    <!-- Keep in sync with DoenerFeastsPlugin.PluginVersion. -->
+    <AssemblyName>VerlerLeben</AssemblyName>
+    <RootNamespace>VerlerLeben</RootNamespace>
+    <!-- Keep in sync with VerlerLebenPlugin.PluginVersion. -->
     <Version>1.0.0</Version>
     <TargetFramework>net462</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets/*.png" LogicalName="DoenerFeasts.%(Filename).png" />
+    <EmbeddedResource Include="Assets/*.png" LogicalName="VerlerLeben.%(Filename).png" />
     <None Remove="tools/**;Thunderstore/**;dist/**" />
   </ItemGroup>
 
@@ -61,8 +61,8 @@
 
   <!-- Copy the freshly built plugin into the game. Disable with -p:InstallToGame=false -->
   <Target Name="InstallToGame" AfterTargets="Build" Condition="'$(InstallToGame)' != 'false'">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)/DoenerFeasts" />
-    <Message Importance="high" Text="Installed $(TargetFileName) to $(PluginsDir)/DoenerFeasts" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)/VerlerLeben" />
+    <Message Importance="high" Text="Installed $(TargetFileName) to $(PluginsDir)/VerlerLeben" />
   </Target>
 
   <!-- Release builds also produce a Thunderstore / r2modman compatible zip in dist/. -->
@@ -71,7 +71,7 @@
       <PackageDir>$(BaseIntermediateOutputPath)thunderstore</PackageDir>
       <ManifestJson>
 {
-  "name": "DoenerFeasts",
+  "name": "VerlerLeben",
   "version_number": "$(Version)",
   "website_url": "https://github.com/Stanni97/verler-leben",
   "description": "Spexarder Pizza and Kaunitzer Teller: two baked Doener feasts for the Feaster, with lots of health and stamina.",
@@ -87,8 +87,8 @@
     <Copy SourceFiles="Thunderstore/icon.png;README.md;CHANGELOG.md;LICENSE" DestinationFolder="$(PackageDir)" />
     <WriteLinesToFile File="$(PackageDir)/manifest.json" Lines="$(ManifestJson.Trim())" Overwrite="true" />
     <MakeDir Directories="dist" />
-    <ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="dist/DoenerFeasts-$(Version).zip" Overwrite="true" />
-    <Message Importance="high" Text="Packaged dist/DoenerFeasts-$(Version).zip" />
+    <ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="dist/VerlerLeben-$(Version).zip" Overwrite="true" />
+    <Message Importance="high" Text="Packaged dist/VerlerLeben-$(Version).zip" />
   </Target>
 
 </Project>

@@ -1,4 +1,4 @@
-"""Draws the item icons for Doener Feasts.
+"""Draws the item icons for Verler Leben.
 
 Usage: python3 make_icons.py OUT_DIR [SIZE]
   Writes doener.png, kaese.png, teller.png, tellerraw.png, pizza.png and pizzaraw.png.
