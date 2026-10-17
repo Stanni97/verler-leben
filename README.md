@@ -159,6 +159,10 @@ python3 tools/make_icons.py /tmp/icons256 256   # danach pizza.png als Thunderst
 
 Die Mod nutzt [Jotunn](https://github.com/Valheim-Modding/Jotunn) und klont die Vanilla-Feasts. Pro Gericht entstehen drei Items: das rohe Gericht (am Zubereitungstisch hergestellt), das gebackene Gericht (kommt aus dem Steinofen und ist das, was der Servierteller verbraucht) und das Feast selbst, das auf dem Tisch steht. Die Feasts nutzen die Modelle der Vanilla-Feasts der Wiesen (Teller) und des Schwarzwalds (Pizza). Nur die Icons und Werte sind eigen.
 
+## Automatische Updates
+
+Diese Mod wird vom [Bifrost Updater](https://github.com/Stanni97/bifrost-updater) mit aktualisiert, wenn er installiert ist. Er prüft beim Spielstart das neueste GitHub-Release. Die Mod nennt dafür ihr Repository in der DLL. Der Updater ist optional, die Mod läuft auch ohne.
+
 ## Lizenz
 
 Code und Icons stehen unter der [MIT-Lizenz](LICENSE).

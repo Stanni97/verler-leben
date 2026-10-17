@@ -18,6 +18,11 @@
     <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
   </PropertyGroup>
 
+  <!-- StanniUpdater reads this to know where the mod's updates come from. -->
+  <ItemGroup>
+    <AssemblyMetadata Include="UpdateRepo" Value="Stanni97/verler-leben" />
+  </ItemGroup>
+
   <!-- Default Steam install locations. Override with: dotnet build -p:ValheimDir="/path/to/Valheim" -->
   <PropertyGroup Condition="'$(ValheimDir)' == '' and '$(OS)' == 'Windows_NT'">
     <ValheimDir>C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimDir>
