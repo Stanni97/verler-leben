@@ -20,7 +20,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.1.0";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -30,7 +30,8 @@ namespace VerlerLeben
             new Ingredient
             {
                 Key = "Doener", PrefabName = "DF_Doener", BasePrefab = "LoxMeat",
-                Ingredients = "CookedLoxMeat:2,SpicePlains:1", Amount = 2,
+                // Lox (Plains), wolf (Mountains) and the Mistlands spice.
+                Ingredients = "CookedLoxMeat:2,CookedWolfMeat:2,SpiceMistlands:1", Amount = 3,
             },
             new Ingredient
             {
@@ -46,16 +47,16 @@ namespace VerlerLeben
             {
                 Key = "Teller", RawPrefab = "DF_TellerRaw", MaterialPrefab = "DF_Teller_Material", FeastPrefab = "DF_FeastTeller",
                 BaseMaterial = "FeastMeadows_Material", BaseFeast = "FeastMeadows",
-                Ingredients = "DF_Doener:4,DF_Kaese:3,Carrot:4",
-                Health = 80f, Stamina = 40f, Regen = 6f, BurnSeconds = 3000f,
+                Ingredients = "DF_Doener:6,DF_Kaese:4,Carrot:5,Onion:3,MushroomJotunPuffs:2",
+                Health = 100f, Stamina = 50f, Regen = 7f, BurnSeconds = 3600f,
             },
             // Balanced and very filling: a big pizza with plenty of Döner meat.
             new Dish
             {
                 Key = "Pizza", RawPrefab = "DF_PizzaRaw", MaterialPrefab = "DF_Pizza_Material", FeastPrefab = "DF_FeastPizza",
                 BaseMaterial = "FeastBlackforest_Material", BaseFeast = "FeastBlackforest",
-                Ingredients = "BreadDough:3,DF_Doener:6,DF_Kaese:4,Raspberry:3",
-                Health = 65f, Stamina = 65f, Regen = 4f, BurnSeconds = 4200f,
+                Ingredients = "BreadDough:4,DF_Doener:8,DF_Kaese:6,Cloudberry:4,MushroomMagecap:2,Onion:2",
+                Health = 80f, Stamina = 80f, Regen = 6f, BurnSeconds = 4800f,
             },
         };
 
@@ -85,7 +86,7 @@ namespace VerlerLeben
             loc.AddTranslation("English", new Dictionary<string, string>
             {
                 { "item_df_doener", "Döner Meat" },
-                { "item_df_doener_desc", "Thin slices of lox meat from the spit, well seasoned. The base of every good feast." },
+                { "item_df_doener_desc", "Thin slices of lox and wolf meat from the spit, seasoned with the spice of the Mistlands. The base of every good feast." },
                 { "item_df_kaese", "Cheese" },
                 { "item_df_kaese_desc", "Melts beautifully. Made from lox milk, don't ask." },
 
@@ -103,7 +104,7 @@ namespace VerlerLeben
             loc.AddTranslation("German", new Dictionary<string, string>
             {
                 { "item_df_doener", "Dönerfleisch" },
-                { "item_df_doener_desc", "Dünne, gut gewürzte Scheiben Loxfleisch vom Spieß. Die Grundlage jedes guten Festmahls." },
+                { "item_df_doener_desc", "Dünne Scheiben Lox- und Wolfsfleisch vom Spieß, gewürzt mit dem Gewürz der Nebelwelt. Die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
                 { "item_df_kaese_desc", "Schmilzt wunderbar. Aus Loxmilch gemacht, frag nicht." },
 
