@@ -118,7 +118,8 @@ def weights_of(i):
 out_v, out_uv, out_w, idx = [], [], [], []
 for tri, mat in cow["tris"]:
     u = (mat + 0.5) * cell / palette.width
-    for vi in tri:
+    # Mirroring X turns the faces inside out; the Lox mesh has cross(b-a, c-a) pointing outwards, so reverse.
+    for vi in reversed(tri):
         idx.append(len(out_v))
         out_v.append(raw[vi]); out_uv.append((u, 0.5)); out_w.append(weights_of(vi))
 
