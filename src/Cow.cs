@@ -137,7 +137,7 @@ namespace VerlerLeben
             growup.m_growTime = settings.GrowSeconds;
         }
 
-        // ---- fur: black and white patches painted over the Lox texture
+        // ---- looks: smooth short coat in white with black patches instead of the shaggy Lox fur
 
         private static void ApplyCowPattern(GameObject prefab, int seed)
         {
@@ -146,10 +146,19 @@ namespace VerlerLeben
                 return;   // dedicated server, nothing is drawn there
             }
 
+            // The shaggy fur is a second mesh with fur cards (Furr1). Without it the body shows its smooth coat.
+            foreach (Renderer renderer in prefab.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer.gameObject.name.IndexOf("fur", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    renderer.gameObject.SetActive(false);
+                }
+            }
+
             var painted = new Dictionary<Texture, Texture2D>();
             foreach (Renderer renderer in prefab.GetComponentsInChildren<Renderer>(true))
             {
-                if (renderer is ParticleSystemRenderer)
+                if (renderer is ParticleSystemRenderer || !renderer.gameObject.activeSelf)
                 {
                     continue;
                 }
@@ -171,6 +180,11 @@ namespace VerlerLeben
 
                     // A copy: the shared material belongs to the real Lox.
                     var copy = new Material(source) { mainTexture = texture };
+                    if (copy.HasProperty("_EmissionColor"))
+                    {
+                        copy.SetColor("_EmissionColor", Color.black);   // the Lox eye glows orange, a cow's does not
+                    }
+
                     materials[i] = copy;
                 }
 
@@ -178,9 +192,13 @@ namespace VerlerLeben
             }
         }
 
+        /// <summary>
+        /// Repaints the texture atlas of the Lox by colour: brown fur becomes a white coat with black patches,
+        /// grey parts (hooves, horns) become dark, pink skin gets lighter and the glowing blue eye turns dark brown.
+        /// </summary>
         private static Texture2D Paint(Texture source, int seed)
         {
-            int width = Mathf.Min(source.width, 1024), height = Mathf.Min(source.height, 1024);
+            int width = Mathf.Min(source.width * 2, 1024), height = Mathf.Min(source.height * 2, 1024);
             RenderTexture target = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
             RenderTexture previous = RenderTexture.active;
             try
@@ -194,21 +212,8 @@ namespace VerlerLeben
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        float noise = Mathf.PerlinNoise(x * 0.010f + seed, y * 0.010f + seed * 0.7f) * 0.8f
-                                      + Mathf.PerlinNoise(x * 0.035f + seed * 1.3f, y * 0.035f) * 0.2f;
                         int index = y * width + x;
-                        Color32 c = pixels[index];
-                        if (noise > 0.58f)
-                        {
-                            // dark patch, keeps the fur structure
-                            pixels[index] = new Color32((byte)(c.r * 0.22f), (byte)(c.g * 0.22f), (byte)(c.b * 0.22f), c.a);
-                        }
-                        else
-                        {
-                            // white coat: lighten the brown fur
-                            pixels[index] = new Color32(
-                                (byte)Mathf.Min(255, 70 + c.r * 0.75f), (byte)Mathf.Min(255, 70 + c.g * 0.75f), (byte)Mathf.Min(255, 70 + c.b * 0.75f), c.a);
-                        }
+                        pixels[index] = Recolor(pixels[index], x / (float)width, y / (float)height, seed);
                     }
                 }
 
@@ -222,6 +227,46 @@ namespace VerlerLeben
                 RenderTexture.active = previous;
                 RenderTexture.ReleaseTemporary(target);
             }
+        }
+
+        private static Color32 Recolor(Color32 c, float u, float v, int seed)
+        {
+            int lum = (c.r * 3 + c.g * 6 + c.b) / 10;
+            if (c.a < 8 || lum < 14)
+            {
+                return c;   // background and deep shadows stay
+            }
+
+            bool blue = c.b > c.r + 8 && c.b > c.g - 4;
+            bool pink = c.r > c.g + 28 && c.b > c.g + 8;
+            bool grey = Mathf.Abs(c.r - c.g) < 22 && Mathf.Abs(c.g - c.b) < 22;
+            if (blue)
+            {
+                return new Color32(34, 24, 20, c.a);                                          // eye
+            }
+
+            if (pink)
+            {
+                float k = 0.8f + lum / 400f;                                                  // nose and skin
+                return new Color32((byte)Mathf.Min(255, 236 * k), (byte)Mathf.Min(255, 178 * k), (byte)Mathf.Min(255, 176 * k), c.a);
+            }
+
+            if (grey)
+            {
+                byte dark = (byte)Mathf.Clamp(lum * 0.45f + 14f, 0f, 255f);                   // hooves and horns
+                return new Color32(dark, dark, (byte)(dark + 3), c.a);
+            }
+
+            // coat: black patches from two noise layers, white everywhere else, the fur detail shines through
+            float noise = Mathf.PerlinNoise(u * 7f + seed, v * 7f) * 0.75f + Mathf.PerlinNoise(u * 19f + seed * 1.7f, v * 19f) * 0.25f;
+            float detail = Mathf.Clamp(0.8f + lum / 500f, 0.7f, 1.05f);
+            if (noise > 0.56f)
+            {
+                float k = 0.65f + lum / 330f;
+                return new Color32((byte)Mathf.Min(255, 30 * k), (byte)Mathf.Min(255, 28 * k), (byte)Mathf.Min(255, 32 * k), c.a);
+            }
+
+            return new Color32((byte)Mathf.Min(255, 240 * detail), (byte)Mathf.Min(255, 234 * detail), (byte)Mathf.Min(255, 224 * detail), c.a);
         }
     }
 
