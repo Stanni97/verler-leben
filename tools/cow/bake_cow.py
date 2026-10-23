@@ -20,9 +20,9 @@ size = int(args[2]) if len(args) > 2 else 512
 
 COATS = {
     # name: (base coat, patches)
-    # Valheim's sun is bright: a white coat above ~0.5 blooms like a lamp (the brown coat at 0.4 looks right).
-    "schwarzbunt": ((0.46, 0.45, 0.42), (0.035, 0.032, 0.032)),
-    "rotbunt": ((0.46, 0.45, 0.42), (0.30, 0.11, 0.05)),
+    # A neutral, slightly cool white: the sun is warm, and AO and the belly shading already darken it.
+    "schwarzbunt": ((0.58, 0.58, 0.56), (0.035, 0.032, 0.032)),
+    "rotbunt": ((0.58, 0.58, 0.56), (0.30, 0.11, 0.05)),
     "braun": ((0.40, 0.27, 0.17), (0.30, 0.19, 0.11)),
 }
 PINK = (0.48, 0.28, 0.30)
@@ -153,7 +153,7 @@ links.new(coord.outputs["Object"], xyz.inputs["Vector"])
 height = nodes.new("ShaderNodeMapRange")
 height.inputs["From Min"].default_value = 0.8
 height.inputs["From Max"].default_value = 4.5
-height.inputs["To Min"].default_value = 0.82
+height.inputs["To Min"].default_value = 0.9
 height.inputs["To Max"].default_value = 1.0
 links.new(xyz.outputs["Z"], height.inputs["Value"])
 shade = nodes.new("ShaderNodeMath")
@@ -202,7 +202,7 @@ for name, (coat, patch) in COATS.items():
     img = bake("DIFFUSE", "coat_" + name)
     px = list(img.pixels)
     for i in range(0, len(px), 4):
-        occlusion = 0.55 + 0.45 * ao_px[i]
+        occlusion = 0.68 + 0.32 * ao_px[i]
         px[i] *= occlusion
         px[i + 1] *= occlusion
         px[i + 2] *= occlusion
