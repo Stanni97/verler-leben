@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1
+
+- Dönerfleisch wird aus 1 Rindfleisch, 1 gebratenem Loxfleisch und 1 Berg-Gewürz gemacht (statt 2 gebratenem Wolfsfleisch).
+- Bestehende Configs behalten den alten Wert. Zum Übernehmen in `BepInEx/config/felix.verlerleben.cfg` unter `[Doener]` die Zeile `Ingredients` anpassen oder die Datei löschen.
+
 ## 1.2.0
 
 - **Kuh** in den Wiesen mit eigenem Kuhmodell (Quaternius, CC0, geglättet, mit Fell-Texturen in Schwarzbunt, Rotbunt und Braun) auf dem Lox-Skelett, harmlos (kein Angriff, kein Zerstören von Zäunen). Zähmen mit Gerste oder Flachs, Züchten über Kälber, **Melken** durch Streicheln einmal pro Tag. Neue Items: Milch und Rindfleisch.

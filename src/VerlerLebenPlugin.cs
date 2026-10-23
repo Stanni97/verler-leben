@@ -31,8 +31,8 @@ namespace VerlerLeben
             new Ingredient
             {
                 Key = "Doener", PrefabName = "DF_Doener", BasePrefab = "LoxMeat",
-                // Beef of the cow, wolf meat from the Mountains and the Mountains spice.
-                Ingredients = "DF_Rindfleisch:1,CookedWolfMeat:2,SpiceMountains:1", Amount = 3,
+                // Beef of the cow, a little lox from the Plains and the Mountains spice.
+                Ingredients = "DF_Rindfleisch:1,CookedLoxMeat:1,SpiceMountains:1", Amount = 3,
             },
             new Ingredient
             {
@@ -121,7 +121,7 @@ namespace VerlerLeben
                 { "se_df_boonekamp_start", "Prost!" },
                 { "se_df_boonekamp_stop", "The warmth fades." },
                 { "item_df_doener", "Döner Meat" },
-                { "item_df_doener_desc", "Thin slices of wolf and lox meat from the spit, with onions. The base of every good feast." },
+                { "item_df_doener_desc", "Thin slices of beef and lox meat from the spit. The base of every good feast." },
                 { "item_df_kaese", "Cheese" },
                 { "item_df_kaese_desc", "Barley cheese, made from barley milk like the oat milk of the north. Melts beautifully." },
 
@@ -156,7 +156,7 @@ namespace VerlerLeben
                 { "se_df_boonekamp_start", "Prost!" },
                 { "se_df_boonekamp_stop", "Die Wärme lässt nach." },
                 { "item_df_doener", "Dönerfleisch" },
-                { "item_df_doener_desc", "Dünne Scheiben Wolfs- und Loxfleisch vom Spieß, mit Zwiebeln. Die Grundlage jedes guten Festmahls." },
+                { "item_df_doener_desc", "Dünne Scheiben Rind- und Loxfleisch vom Spieß. Die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
                 { "item_df_kaese_desc", "Gerstenkäse aus Gerstenmilch, so wie die Hafermilch im Norden. Schmilzt wunderbar." },
 

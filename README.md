@@ -39,7 +39,7 @@ In den **Wiesen** laufen jetzt Kühe herum, schwarzbunt, rotbunt oder braun. Sie
    | --- | --- | --- |
    | Milch | von der zahmen Kuh melken | |
    | Rindfleisch | von der Kuh | |
-   | Dönerfleisch | 1 Rindfleisch, 2 gebratenes Wolfsfleisch, 1 Berg-Gewürz | 3 |
+   | Dönerfleisch | 1 Rindfleisch, 1 gebratenes Loxfleisch, 1 Berg-Gewürz | 3 |
    | Käse | 2 Milch | 3 |
 
 2. **Rohes Gericht** am Essenszubereitungstisch herstellen:
