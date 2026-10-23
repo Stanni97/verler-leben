@@ -65,7 +65,16 @@ namespace VerlerLeben
                 material.SetColor("_EmissionColor", Color.black);
             }
 
+            if (material.HasProperty("_Glossiness"))
+            {
+                material.SetFloat("_Glossiness", 0.03f);   // matt coat, the flat faces would shine otherwise
+            }
+
             body.sharedMaterials = new[] { material };
+            if (prefab.GetComponent<CowLegs>() == null)
+            {
+                prefab.AddComponent<CowLegs>();
+            }
 
             // The shaggy fur cards and the saddle belong to the Lox.
             foreach (SkinnedMeshRenderer renderer in prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true))
@@ -174,6 +183,72 @@ namespace VerlerLeben
                 texture.wrapMode = TextureWrapMode.Clamp;
                 return texture;
             }
+        }
+    }
+}
+
+namespace VerlerLeben
+{
+    /// <summary>
+    /// The Lox animations splay the legs sideways, which suits the bulky Lox but gives the slim cow bow legs.
+    /// After the animation of each frame, this removes the sideways part of every leg segment, so the legs stay
+    /// straight seen from the front and only swing forwards and backwards.
+    /// </summary>
+    internal class CowLegs : UnityEngine.MonoBehaviour
+    {
+        private static readonly string[][] Chains =
+        {
+            new[] { "Frontupperleg.l", "Frontlowerleg.l", "Frontfoot.l" },
+            new[] { "Frontupperleg.r", "Frontlowerleg.r", "Frontfoot.r" },
+            new[] { "Backupperleg.l", "Backlowerleg.l", "Backfoot.l" },
+            new[] { "Backupperleg.r", "Backlowerleg.r", "Backfoot.r" },
+        };
+
+        private UnityEngine.Transform[][] _legs;
+
+        private void Awake()
+        {
+            var byName = new System.Collections.Generic.Dictionary<string, UnityEngine.Transform>();
+            foreach (UnityEngine.Transform t in GetComponentsInChildren<UnityEngine.Transform>(true))
+            {
+                if (!byName.ContainsKey(t.name))
+                {
+                    byName[t.name] = t;
+                }
+            }
+
+            var legs = new System.Collections.Generic.List<UnityEngine.Transform[]>();
+            foreach (string[] chain in Chains)
+            {
+                if (byName.TryGetValue(chain[0], out var upper) && byName.TryGetValue(chain[1], out var lower) && byName.TryGetValue(chain[2], out var foot))
+                {
+                    legs.Add(new[] { upper, lower, foot });
+                }
+            }
+
+            _legs = legs.ToArray();
+        }
+
+        private void LateUpdate()
+        {
+            UnityEngine.Vector3 right = transform.right;
+            foreach (UnityEngine.Transform[] leg in _legs)
+            {
+                Straighten(leg[0], leg[1], right);
+                Straighten(leg[1], leg[2], right);
+            }
+        }
+
+        private static void Straighten(UnityEngine.Transform joint, UnityEngine.Transform child, UnityEngine.Vector3 right)
+        {
+            UnityEngine.Vector3 direction = child.position - joint.position;
+            UnityEngine.Vector3 straight = direction - UnityEngine.Vector3.Project(direction, right);
+            if (straight.sqrMagnitude < 1e-8f || direction.sqrMagnitude < 1e-8f)
+            {
+                return;
+            }
+
+            joint.rotation = UnityEngine.Quaternion.FromToRotation(direction, straight) * joint.rotation;
         }
     }
 }

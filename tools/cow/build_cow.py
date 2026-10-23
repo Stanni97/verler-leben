@@ -68,7 +68,7 @@ for i in range(len(raw)):
 print("scale", s, "bbox", raw.min(0).round(4), raw.max(0).round(4))
 
 # palette
-COLORS = {"White": (236, 233, 226), "Black": (32, 30, 34), "Pink": (226, 146, 156)}
+COLORS = {"White": (222, 218, 210), "Black": (32, 30, 34), "Pink": (216, 140, 150)}
 cell = 16
 palette = Image.new("RGBA", (cell * len(cow["mats"]), cell), (255, 255, 255, 255))
 for i, m in enumerate(cow["mats"]):
