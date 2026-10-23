@@ -17,9 +17,9 @@ namespace VerlerLeben
         private const string BeerStatus = "Potion_barleywine";
 
         // Extra regeneration on top of the base value, as fractions (0.5 = +50 %).
-        public float FeastHealth = 0.5f, FeastStamina = 0.3f;
-        public float MeadHealth = 0.2f, MeadStamina = 0.15f;
-        public float BeerHealth = 0.4f, BeerStamina = 0.3f;
+        public float FeastHealth = 0.15f, FeastStamina = 0.10f;
+        public float MeadHealth = 0.10f, MeadStamina = 0.08f;
+        public float BeerHealth = 0.15f, BeerStamina = 0.10f;
 
         public override void ModifyHealthRegen(ref float regenMultiplier)
         {

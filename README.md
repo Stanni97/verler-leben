@@ -60,12 +60,12 @@ Der **Verler Boonekamp** der Likör Manufaktur Schroeders vom Kirchplatz in Verl
 
 | Wirkung | Lebens- / Ausdauer-Regeneration |
 | --- | --- |
-| Boonekamp allein (5 Minuten) | +30 % / +20 % |
-| dazu ein Teller oder eine Pizza als aktives Essen | +50 % / +30 % |
-| dazu irgendein Met | +20 % / +15 % |
-| dazu **Gerstenwein**, das „kühle Bier“ des Spiels | +40 % / +30 % |
+| Boonekamp allein (5 Minuten) | +25 % / +15 % |
+| dazu ein Teller oder eine Pizza als aktives Essen | +15 % / +10 % |
+| dazu irgendein Met | +10 % / +8 % |
+| dazu **Gerstenwein**, das „kühle Bier“ des Spiels | +15 % / +10 % |
 
-Die Boni addieren sich. Mit Feast und Gerstenwein sind es zum Beispiel +120 % Lebens- und +80 % Ausdauer-Regeneration. Als Met zählt jeder Trank des Hauptspiels (Heilung, Ausdauer, Frostresistenz, Leckeres Met und so weiter).
+Die Boni addieren sich. Mit Feast, Met und Gerstenwein zusammen sind es höchstens +65 % Lebens- und +43 % Ausdauer-Regeneration. Zum Vergleich: ein anhaltendes Met des Hauptspiels gibt +25 % für 5 Minuten. Als Met zählt jeder Trank des Hauptspiels (Heilung, Ausdauer, Frostresistenz, Leckeres Met und so weiter).
 
 Gebraut am **Kessel**: 3 Gerste, 2 Distel, 2 Löwenzahn, 1 Honig, 1 Berg-Gewürz ergeben 2 Flaschen. Er wirkt zusätzlich zu Mets, beides zählt.
 

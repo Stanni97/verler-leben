@@ -100,14 +100,14 @@ namespace VerlerLeben
         public string Ingredients = "Barley:3,Thistle:2,Dandelion:2,Honey:1,SpiceMountains:1";
         public int Amount = 2;
         public float Duration = 300f;
-        public int HealthRegenBonus = 30;
-        public int StaminaRegenBonus = 20;
-        public int FeastHealthRegenBonus = 50;
-        public int FeastStaminaRegenBonus = 30;
-        public int MeadHealthRegenBonus = 20;
-        public int MeadStaminaRegenBonus = 15;
-        public int BeerHealthRegenBonus = 40;
-        public int BeerStaminaRegenBonus = 30;
+        public int HealthRegenBonus = 25;
+        public int StaminaRegenBonus = 15;
+        public int FeastHealthRegenBonus = 15;
+        public int FeastStaminaRegenBonus = 10;
+        public int MeadHealthRegenBonus = 10;
+        public int MeadStaminaRegenBonus = 8;
+        public int BeerHealthRegenBonus = 15;
+        public int BeerStaminaRegenBonus = 10;
 
         public string Token => "df_" + Key.ToLowerInvariant();
         public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
