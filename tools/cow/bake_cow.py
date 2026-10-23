@@ -21,8 +21,8 @@ size = int(args[2]) if len(args) > 2 else 512
 COATS = {
     # name: (base coat, patches)
     # A neutral, slightly cool white: the sun is warm, and AO and the belly shading already darken it.
-    "schwarzbunt": ((0.58, 0.58, 0.56), (0.035, 0.032, 0.032)),
-    "rotbunt": ((0.58, 0.58, 0.56), (0.30, 0.11, 0.05)),
+    "schwarzbunt": ((0.50, 0.50, 0.48), (0.035, 0.032, 0.032)),
+    "rotbunt": ((0.50, 0.50, 0.48), (0.30, 0.11, 0.05)),
     "braun": ((0.40, 0.27, 0.17), (0.30, 0.19, 0.11)),
 }
 PINK = (0.48, 0.28, 0.30)

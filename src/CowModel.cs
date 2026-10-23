@@ -135,10 +135,17 @@ namespace VerlerLeben
 
             material.DisableKeyword("_EMISSION");
 
-            if (material.HasProperty("_Glossiness"))
+            // A matt coat: no smoothness, no specular highlight, no sky reflection.
+            foreach (string property in new[] { "_Glossiness", "_MetalGloss", "_Metallic", "_SpecularHighlights", "_GlossyReflections" })
             {
-                material.SetFloat("_Glossiness", 0f);   // matt coat
+                if (material.HasProperty(property))
+                {
+                    material.SetFloat(property, 0f);
+                }
             }
+
+            material.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
+            material.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
 
             return material;
         }
