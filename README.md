@@ -24,7 +24,7 @@ Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minute
 
 ## Die Kuh
 
-In den **Wiesen** laufen jetzt Kühe herum, schwarz-weiß gefleckt und kleiner als Lox. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
+In den **Wiesen** laufen jetzt Kühe herum: ein schwarz-weißes Low-Poly-Modell, das sich mit den Bewegungen des Lox bewegt. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
 
 - **Zähmen:** Wirf Gerste oder Flachs in ihre Nähe und halte Abstand. Nach etwa 5 Minuten ist sie zahm (ein Lox braucht 30).
 - **Melken:** Eine zahme, satte Kuh streichelst du mit **E**. Statt „Streicheln“ steht dort „Melken“. Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch.
@@ -193,7 +193,7 @@ Diese Mod wird vom [Bifrost Updater](https://github.com/Stanni97/bifrost-updater
 
 ## Hinweis
 
-Inoffizieller Fan-Mod ohne Verbindung zu Schroeders Likör Manufaktur oder anderen genannten Firmen. Die Namen stehen für Orte und Dinge aus Verl in Ostwestfalen, die Icons sind eigene Zeichnungen. Der Modname erinnert an das „Verler Leben“, die Kirmes in Verl.
+Inoffizieller Fan-Mod ohne Verbindung zu Schroeders Likör Manufaktur oder anderen genannten Firmen. Das Kuh-Modell stammt aus dem [Farm Animals Pack von Quaternius](https://opengameart.org/content/lowpoly-animated-farm-animal-pack) (CC0), wie es eingebaut wird, steht in `tools/cow/README.md`. Die Namen stehen für Orte und Dinge aus Verl in Ostwestfalen, die Icons sind eigene Zeichnungen. Der Modname erinnert an das „Verler Leben“, die Kirmes in Verl.
 
 ## Lizenz
 

@@ -82,8 +82,13 @@ namespace VerlerLeben
 
             try
             {
-                ApplyCowPattern(calf.Prefab, 17);
-                ApplyCowPattern(cow.Prefab, 17);
+                // The real cow model; the repainted Lox is the fallback if the model does not fit.
+                if (!CowModel.Apply(cow.Prefab) || !CowModel.Apply(calf.Prefab))
+                {
+                    log.LogWarning("Cow model could not be applied, using the painted Lox.");
+                    ApplyCowPattern(calf.Prefab, 17);
+                    ApplyCowPattern(cow.Prefab, 17);
+                }
             }
             catch (Exception e)
             {
