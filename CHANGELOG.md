@@ -3,6 +3,7 @@
 ## 1.2.1
 
 - Dönerfleisch wird aus 1 Rindfleisch, 1 gebratenem Loxfleisch und 1 Berg-Gewürz gemacht (statt 2 gebratenem Wolfsfleisch).
+- Grund: Mit 2 gebratenem Wolfsfleisch war das Dönerfleisch sonst ein bisschen zu stark (zu OP).
 - Bestehende Configs behalten den alten Wert. Zum Übernehmen in `BepInEx/config/felix.verlerleben.cfg` unter `[Doener]` die Zeile `Ingredients` anpassen oder die Datei löschen.
 
 ## 1.2.0
