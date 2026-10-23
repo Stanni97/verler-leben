@@ -55,7 +55,9 @@ namespace VerlerLeben
             var material = new Material(body.sharedMaterial) { mainTexture = _palette };
             if (material.HasProperty("_BumpMap"))
             {
-                material.SetTexture("_BumpMap", null);
+                // Without a normal map Unity samples plain white, the normals then point at the sky and every
+                // white face turns blue. A flat normal map keeps the real face normals.
+                material.SetTexture("_BumpMap", FlatNormalMap());
             }
 
             if (material.HasProperty("_EmissionColor"))
@@ -137,6 +139,27 @@ namespace VerlerLeben
                 mesh.RecalculateBounds();
                 return mesh;
             }
+        }
+
+        private static Texture2D _flatNormal;
+
+        /// <summary>Flat normal in both encodings Unity uses: RGB (0.5, 0.5, 1) and DXT5nm (G and A = 0.5).</summary>
+        private static Texture2D FlatNormalMap()
+        {
+            if (_flatNormal == null)
+            {
+                _flatNormal = new Texture2D(4, 4, TextureFormat.RGBA32, false, true) { name = "DF_FlatNormal" };
+                var pixels = new Color32[16];
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    pixels[i] = new Color32(128, 128, 255, 128);
+                }
+
+                _flatNormal.SetPixels32(pixels);
+                _flatNormal.Apply(false);
+            }
+
+            return _flatNormal;
         }
 
         private static Texture2D LoadPalette()
