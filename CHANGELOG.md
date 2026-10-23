@@ -2,7 +2,7 @@
 
 ## 1.2.0
 
-- **Kuh** in den Wiesen mit eigenem Low-Poly-Kuhmodell (Quaternius, CC0) auf dem Lox-Skelett, harmlos (kein Angriff, kein Zerstören von Zäunen). Zähmen mit Gerste oder Flachs, Züchten über Kälber, **Melken** durch Streicheln einmal pro Tag. Neue Items: Milch und Rindfleisch.
+- **Kuh** in den Wiesen mit eigenem Kuhmodell (Quaternius, CC0, geglättet, mit Fell-Texturen in Schwarzbunt, Rotbunt und Braun) auf dem Lox-Skelett, harmlos (kein Angriff, kein Zerstören von Zäunen). Zähmen mit Gerste oder Flachs, Züchten über Kälber, **Melken** durch Streicheln einmal pro Tag. Neue Items: Milch und Rindfleisch.
 - Käse wird jetzt aus 2 Milch gemacht (ergibt 3), Dönerfleisch aus 1 Rindfleisch, 2 gebratenem Wolfsfleisch und 1 Berg-Gewürz (ergibt 3). Teller und Pizza brauchen wieder die größeren Mengen mit Zwiebeln, Jotunn- und Magecap-Pilzen, Wolkenbeeren und Berg-Gewürz.
 - **Schroeders Boonekamp** am Kessel: Verdauungsschnaps mit +25 % Lebens- und +15 % Ausdauer-Regeneration. Zusatzboni, die sich addieren: mit Teller oder Pizza als aktivem Essen +15 % / +10 %, mit irgendeinem Met +10 % / +8 %, mit gebrautem Gerstenwein (dem Bier des Spiels) +15 % / +10 %. Höchstens +65 % / +43 %.
 - Neue Abhängigkeit im Code: Harmony (liegt im BepInExPack).

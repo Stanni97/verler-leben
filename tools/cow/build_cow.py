@@ -1,11 +1,12 @@
 """Turns the Quaternius cow into a mesh for the Lox skeleton.
-Usage: build_cow.py COW_JSON LOXSKEL_JSON OUT_BIN OUT_PALETTE OUT_PREVIEW_JSON
+Usage: build_cow.py COW_SMOOTH_JSON LOXSKEL_JSON OUT_BIN OUT_PREVIEW_JSON
+
+COW_SMOOTH_JSON comes from bake_cow.py (smoothed mesh with normals and UVs; the coat textures are baked there).
 
 The Lox stands wide and bends its legs lower than the cow. So the cow is made a bit wider, its legs are moved
 apart, and the leg vertices are weighted by height to the Lox leg bones: they bend where the Lox bends."""
 import json, struct, sys
 import numpy as np
-from PIL import Image
 
 cow = json.load(open(sys.argv[1]))
 skel = json.load(open(sys.argv[2]))
@@ -37,7 +38,7 @@ raw = np.stack([-V[:, 0], V[:, 1], V[:, 2]], axis=1)    # Lox mesh space: x mirr
 cow_front, cow_back = -1.856, 2.196
 lox_front = (bpos["Frontupperleg.l"][1] + bpos["Frontupperleg.r"][1]) / 2
 lox_back = (bpos["Backupperleg.l"][1] + bpos["Backupperleg.r"][1]) / 2
-s = abs(lox_back - lox_front) / abs(cow_back - cow_front) * float(sys.argv[6] if len(sys.argv) > 6 else 1.0)
+s = abs(lox_back - lox_front) / abs(cow_back - cow_front) * float(sys.argv[5] if len(sys.argv) > 5 else 1.0)
 raw *= s
 raw[:, 1] += (lox_front + lox_back) / 2 - s * (cow_front + cow_back) / 2
 raw[:, 2] -= raw[:, 2].min()
@@ -66,14 +67,6 @@ for i in range(len(raw)):
     if key and amount > 0:
         raw[i, 0] += np.sign(raw[i, 0]) * SPREAD * amount
 print("scale", s, "bbox", raw.min(0).round(4), raw.max(0).round(4))
-
-# palette
-COLORS = {"White": (222, 218, 210), "Black": (32, 30, 34), "Pink": (216, 140, 150)}
-cell = 16
-palette = Image.new("RGBA", (cell * len(cow["mats"]), cell), (255, 255, 255, 255))
-for i, m in enumerate(cow["mats"]):
-    palette.paste(COLORS.get(m, (200, 200, 200)) + (255,), (i * cell, 0, (i + 1) * cell, cell))
-palette.save(sys.argv[4])
 
 BAND = 0.002
 
@@ -114,29 +107,35 @@ def weights_of(i):
         top.append((0, 0.0))
     return top
 
-# flat shaded: every triangle gets its own vertices
-out_v, out_uv, out_w, idx = [], [], [], []
-for tri, mat in cow["tris"]:
-    u = (mat + 0.5) * cell / palette.width
-    # Mirroring X turns the faces inside out; the Lox mesh has cross(b-a, c-a) pointing outwards, so reverse.
-    for vi in reversed(tri):
-        idx.append(len(out_v))
-        out_v.append(raw[vi]); out_uv.append((u, 0.5)); out_w.append(weights_of(vi))
+# vertices: one per corner with its own normal and UV, shared where all three match
+def normal_of(n):
+    v = np.array([-n[0] / WIDTH, n[1], n[2]])   # mirrored like the positions, and corrected for the width scale
+    return v / (np.linalg.norm(v) or 1.0)
+
+keys, out_v, out_n, out_uv, out_w, idx = {}, [], [], [], [], []
+for tri in cow["tris"]:
+    for ci in reversed(tri):   # mirroring X turns the faces inside out; the Lox has cross(b-a, c-a) outwards
+        vi, n, uv = cow["corners"][ci]
+        key = (vi, tuple(np.round(n, 4)), tuple(np.round(uv, 5)))
+        if key not in keys:
+            keys[key] = len(out_v)
+            out_v.append(raw[vi]); out_n.append(normal_of(n)); out_uv.append(uv); out_w.append(weights_of(vi))
+        idx.append(keys[key])
 
 with open(sys.argv[3], "wb") as f:
-    f.write(b"COW1")
+    f.write(b"COW2")
     f.write(struct.pack("<i", len(bones)))
     for b in bones:
         data = b.encode("utf-8"); f.write(struct.pack("<i", len(data))); f.write(data)
     f.write(struct.pack("<i", len(out_v)))
-    for p, uv, w in zip(out_v, out_uv, out_w):
-        f.write(struct.pack("<5f", p[0], p[1], p[2], uv[0], uv[1]))
+    for p, n, uv, w in zip(out_v, out_n, out_uv, out_w):
+        f.write(struct.pack("<8f", p[0], p[1], p[2], n[0], n[1], n[2], uv[0], uv[1]))
         f.write(struct.pack("<4B", *[i for i, _ in w]))
         f.write(struct.pack("<4f", *[v for _, v in w]))
     f.write(struct.pack("<i", len(idx)))
     f.write(struct.pack("<%di" % len(idx), *idx))
 print("wrote", len(out_v), "vertices", len(idx) // 3, "triangles")
 
-json.dump({"verts": [list(map(float, p)) for p in out_v], "mats": [m for _, m in cow["tris"]],
-           "bones": {b: list(map(float, p)) for b, p in bpos.items()}, "colors": COLORS, "matnames": cow["mats"]},
-          open(sys.argv[5], "w"))
+json.dump({"verts": [list(map(float, p)) for p in out_v], "uvs": [list(map(float, u)) for u in out_uv],
+           "tris": [idx[i:i + 3] for i in range(0, len(idx), 3)],
+           "bones": {b: list(map(float, p)) for b, p in bpos.items()}}, open(sys.argv[4], "w"))

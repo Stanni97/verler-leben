@@ -24,7 +24,7 @@ Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minute
 
 ## Die Kuh
 
-In den **Wiesen** laufen jetzt Kühe herum: ein schwarz-weißes Low-Poly-Modell, das sich mit den Bewegungen des Lox bewegt. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
+In den **Wiesen** laufen jetzt Kühe herum, schwarzbunt, rotbunt oder braun. Sie bewegen sich mit den Animationen des Lox, sehen aber aus wie Kühe. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
 
 - **Zähmen:** Wirf Gerste oder Flachs in ihre Nähe und halte Abstand. Nach etwa 5 Minuten ist sie zahm (ein Lox braucht 30).
 - **Melken:** Eine zahme, satte Kuh streichelst du mit **E**. Statt „Streicheln“ steht dort „Melken“. Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch.

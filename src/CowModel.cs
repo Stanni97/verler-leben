@@ -10,17 +10,24 @@ using UnityEngine.Rendering;
 namespace VerlerLeben
 {
     /// <summary>
-    /// Puts the low-poly cow (Quaternius, CC0) on the Lox skeleton. The mesh in Assets/cow_mesh.bin is already
-    /// aligned to the Lox body and weighted to its bones (tools/cow/build_cow.py), so the cow walks, eats and dies
-    /// with the Lox animations.
+    /// Puts the cow (Quaternius, CC0, smoothed and with baked coat textures) on the Lox skeleton. The mesh in
+    /// Assets/cow_mesh.bin is already aligned to the Lox body and weighted to its bones (tools/cow), so the cow walks,
+    /// eats and dies with the Lox animations. Each cow gets one of three coats, the same on every client.
     /// </summary>
     internal static class CowModel
     {
         private const string MeshResource = "VerlerLeben.cow_mesh.bin";
-        private const string PaletteResource = "VerlerLeben.cowpalette.png";
+
+        // Holstein (black and white), red and white, brown. Weights: how often each coat appears.
+        private static readonly (string resource, int weight)[] Coats =
+        {
+            ("VerlerLeben.cow_schwarzbunt.png", 5),
+            ("VerlerLeben.cow_rotbunt.png", 3),
+            ("VerlerLeben.cow_braun.png", 2),
+        };
 
         private static Mesh _mesh;
-        private static Texture2D _palette;
+        internal static Material[] CoatMaterials;
 
         /// <summary>Returns false if the prefab has no Lox body to replace or the data is missing.</summary>
         public static bool Apply(GameObject prefab)
@@ -30,15 +37,7 @@ namespace VerlerLeben
                 return true;   // dedicated server, nothing is drawn there
             }
 
-            SkinnedMeshRenderer body = null;
-            foreach (SkinnedMeshRenderer renderer in prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-            {
-                if (renderer.name == "Body")
-                {
-                    body = renderer;
-                }
-            }
-
+            SkinnedMeshRenderer body = FindBody(prefab);
             if (body == null || body.sharedMesh == null)
             {
                 return false;
@@ -48,32 +47,23 @@ namespace VerlerLeben
             {
                 _mesh = LoadMesh(body.bones);
                 _mesh.bindposes = body.sharedMesh.bindposes;
-                _palette = LoadPalette();
+                CoatMaterials = new Material[Coats.Length];
+                for (int i = 0; i < Coats.Length; i++)
+                {
+                    CoatMaterials[i] = CoatMaterial(body.sharedMaterial, LoadTexture(Coats[i].resource));
+                }
             }
 
             body.sharedMesh = _mesh;
-            var material = new Material(body.sharedMaterial) { mainTexture = _palette };
-            if (material.HasProperty("_BumpMap"))
-            {
-                // Without a normal map Unity samples plain white, the normals then point at the sky and every
-                // white face turns blue. A flat normal map keeps the real face normals.
-                material.SetTexture("_BumpMap", FlatNormalMap());
-            }
-
-            if (material.HasProperty("_EmissionColor"))
-            {
-                material.SetColor("_EmissionColor", Color.black);
-            }
-
-            if (material.HasProperty("_Glossiness"))
-            {
-                material.SetFloat("_Glossiness", 0.03f);   // matt coat, the flat faces would shine otherwise
-            }
-
-            body.sharedMaterials = new[] { material };
+            body.sharedMaterials = new[] { CoatMaterials[0] };
             if (prefab.GetComponent<CowLegs>() == null)
             {
                 prefab.AddComponent<CowLegs>();
+            }
+
+            if (prefab.GetComponent<CowCoat>() == null)
+            {
+                prefab.AddComponent<CowCoat>();
             }
 
             // The shaggy fur cards and the saddle belong to the Lox.
@@ -88,12 +78,70 @@ namespace VerlerLeben
             return true;
         }
 
+        internal static SkinnedMeshRenderer FindBody(GameObject root)
+        {
+            foreach (SkinnedMeshRenderer renderer in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                if (renderer.name == "Body")
+                {
+                    return renderer;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Picks a coat from a number every client agrees on (the object's network id).</summary>
+        internal static int CoatFor(uint id)
+        {
+            int total = 0;
+            foreach (var coat in Coats)
+            {
+                total += coat.weight;
+            }
+
+            int pick = (int)(id % (uint)total);
+            for (int i = 0; i < Coats.Length; i++)
+            {
+                if (pick < Coats[i].weight)
+                {
+                    return i;
+                }
+
+                pick -= Coats[i].weight;
+            }
+
+            return 0;
+        }
+
+        private static Material CoatMaterial(Material lox, Texture2D coat)
+        {
+            var material = new Material(lox) { mainTexture = coat };
+            if (material.HasProperty("_BumpMap"))
+            {
+                // The Lox normal map does not fit the cow's UVs; a flat one keeps the mesh normals.
+                material.SetTexture("_BumpMap", FlatNormalMap());
+            }
+
+            if (material.HasProperty("_EmissionColor"))
+            {
+                material.SetColor("_EmissionColor", Color.black);   // the Lox eye glows, a cow's does not
+            }
+
+            if (material.HasProperty("_Glossiness"))
+            {
+                material.SetFloat("_Glossiness", 0.03f);   // matt coat
+            }
+
+            return material;
+        }
+
         private static Mesh LoadMesh(Transform[] skeleton)
         {
             using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(MeshResource))
             using (var reader = new BinaryReader(stream))
             {
-                if (Encoding.ASCII.GetString(reader.ReadBytes(4)) != "COW1")
+                if (Encoding.ASCII.GetString(reader.ReadBytes(4)) != "COW2")
                 {
                     throw new InvalidDataException("cow_mesh.bin has an unknown format.");
                 }
@@ -118,11 +166,13 @@ namespace VerlerLeben
 
                 int vertexCount = reader.ReadInt32();
                 var vertices = new Vector3[vertexCount];
+                var normals = new Vector3[vertexCount];
                 var uvs = new Vector2[vertexCount];
                 var weights = new BoneWeight[vertexCount];
                 for (int i = 0; i < vertexCount; i++)
                 {
                     vertices[i] = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                    normals[i] = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                     uvs[i] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                     byte b0 = reader.ReadByte(), b1 = reader.ReadByte(), b2 = reader.ReadByte(), b3 = reader.ReadByte();
                     weights[i] = new BoneWeight
@@ -141,11 +191,11 @@ namespace VerlerLeben
 
                 var mesh = new Mesh { name = "DF_Kuh" };
                 mesh.vertices = vertices;
+                mesh.normals = normals;
                 mesh.uv = uvs;
                 mesh.boneWeights = weights;
                 mesh.triangles = triangles;
-                mesh.RecalculateNormals();   // vertices are not shared, so the low-poly faces stay flat
-                mesh.RecalculateTangents();  // the creature shader uses a normal map
+                mesh.RecalculateTangents();   // the creature shader uses a normal map
                 mesh.RecalculateBounds();
                 return mesh;
             }
@@ -172,20 +222,37 @@ namespace VerlerLeben
             return _flatNormal;
         }
 
-        private static Texture2D LoadPalette()
+        private static Texture2D LoadTexture(string resource)
         {
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(PaletteResource))
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
             using (var buffer = new MemoryStream())
             {
                 stream.CopyTo(buffer);
                 Texture2D texture = AssetUtils.LoadImage(buffer.ToArray());
-                texture.filterMode = FilterMode.Point;   // sharp colours, no bleeding between the palette cells
                 texture.wrapMode = TextureWrapMode.Clamp;
+                texture.anisoLevel = 4;
                 return texture;
             }
         }
     }
+
+    /// <summary>Gives every cow and calf its coat, chosen by its network id so all players see the same.</summary>
+    internal class CowCoat : MonoBehaviour
+    {
+        private void Start()
+        {
+            var nview = GetComponent<ZNetView>();
+            SkinnedMeshRenderer body = CowModel.FindBody(gameObject);
+            if (nview == null || !nview.IsValid() || body == null || CowModel.CoatMaterials == null)
+            {
+                return;
+            }
+
+            body.sharedMaterial = CowModel.CoatMaterials[CowModel.CoatFor(nview.GetZDO().m_uid.ID)];
+        }
+    }
 }
+
 
 namespace VerlerLeben
 {
