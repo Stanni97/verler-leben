@@ -58,10 +58,14 @@ Das Berg-Gewürz gibt es nicht zu farmen, es kommt wie bei den Feasts aus dem Ha
 
 Der **Verler Boonekamp** der Likör Manufaktur Schroeders vom Kirchplatz in Verl (Rezept seit 1798) ist ein Magenbitter aus 34 Kräutern, Wurzeln und Früchten mit 42 % Vol., in Verl liebevoll „Verler Heimatwasser“ genannt. Der Hersteller empfiehlt ihn „zu kühlem Bier und gutem Essen“. Im Spiel ist er der Verdauungsschnaps nach einem deftigen Feast:
 
-| Wirkung | Wert |
+| Wirkung | Lebens- / Ausdauer-Regeneration |
 | --- | --- |
-| Lebens- und Ausdauer-Regeneration | +30 % / +20 % für 5 Minuten |
-| **Während ein Teller oder eine Pizza als Essen aktiv ist** | **+80 % / +50 %** |
+| Boonekamp allein (5 Minuten) | +30 % / +20 % |
+| dazu ein Teller oder eine Pizza als aktives Essen | +50 % / +30 % |
+| dazu irgendein Met | +20 % / +15 % |
+| dazu **Gerstenwein**, das „kühle Bier“ des Spiels | +40 % / +30 % |
+
+Die Boni addieren sich. Mit Feast und Gerstenwein sind es zum Beispiel +120 % Lebens- und +80 % Ausdauer-Regeneration. Als Met zählt jeder Trank des Hauptspiels (Heilung, Ausdauer, Frostresistenz, Leckeres Met und so weiter).
 
 Gebraut am **Kessel**: 3 Gerste, 2 Distel, 2 Löwenzahn, 1 Honig, 1 Berg-Gewürz ergeben 2 Flaschen. Er wirkt zusätzlich zu Mets, beides zählt.
 
@@ -139,7 +143,7 @@ Die Abschnitte `[Teller]` und `[Pizza]` (die Feasts):
 
 Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`.
 
-Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie `FeastHealthRegenBonusPercent` und `FeastStaminaRegenBonusPercent` für den Bonus nach einem Feast.
+Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
 
 Der Abschnitt `[Cow]` schaltet die Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
 

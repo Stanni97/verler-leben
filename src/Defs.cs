@@ -102,8 +102,12 @@ namespace VerlerLeben
         public float Duration = 300f;
         public int HealthRegenBonus = 30;
         public int StaminaRegenBonus = 20;
-        public int FeastHealthRegenBonus = 80;
-        public int FeastStaminaRegenBonus = 50;
+        public int FeastHealthRegenBonus = 50;
+        public int FeastStaminaRegenBonus = 30;
+        public int MeadHealthRegenBonus = 20;
+        public int MeadStaminaRegenBonus = 15;
+        public int BeerHealthRegenBonus = 40;
+        public int BeerStaminaRegenBonus = 30;
 
         public string Token => "df_" + Key.ToLowerInvariant();
         public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
@@ -119,10 +123,18 @@ namespace VerlerLeben
             Duration = config.Bind(s, "DurationSeconds", Duration, "How long the buff lasts, in seconds.").Value;
             HealthRegenBonus = config.Bind(s, "HealthRegenBonusPercent", HealthRegenBonus, "Faster health regeneration, in percent.").Value;
             StaminaRegenBonus = config.Bind(s, "StaminaRegenBonusPercent", StaminaRegenBonus, "Faster stamina regeneration, in percent.").Value;
-            FeastHealthRegenBonus = config.Bind(s, "FeastHealthRegenBonusPercent", FeastHealthRegenBonus,
-                "Faster health regeneration while a feast of this mod is active, in percent.").Value;
-            FeastStaminaRegenBonus = config.Bind(s, "FeastStaminaRegenBonusPercent", FeastStaminaRegenBonus,
-                "Faster stamina regeneration while a feast of this mod is active, in percent.").Value;
+            FeastHealthRegenBonus = config.Bind(s, "FeastExtraHealthRegenPercent", FeastHealthRegenBonus,
+                "Extra health regeneration while a feast of this mod is active, on top of the base value, in percent.").Value;
+            FeastStaminaRegenBonus = config.Bind(s, "FeastExtraStaminaRegenPercent", FeastStaminaRegenBonus,
+                "Extra stamina regeneration while a feast of this mod is active, in percent.").Value;
+            MeadHealthRegenBonus = config.Bind(s, "MeadExtraHealthRegenPercent", MeadHealthRegenBonus,
+                "Extra health regeneration while any mead is active, in percent.").Value;
+            MeadStaminaRegenBonus = config.Bind(s, "MeadExtraStaminaRegenPercent", MeadStaminaRegenBonus,
+                "Extra stamina regeneration while any mead is active, in percent.").Value;
+            BeerHealthRegenBonus = config.Bind(s, "BeerExtraHealthRegenPercent", BeerHealthRegenBonus,
+                "Extra health regeneration while barley wine, the beer of the game, is active, in percent.").Value;
+            BeerStaminaRegenBonus = config.Bind(s, "BeerExtraStaminaRegenPercent", BeerStaminaRegenBonus,
+                "Extra stamina regeneration while barley wine is active, in percent.").Value;
         }
     }
 }

@@ -115,9 +115,9 @@ namespace VerlerLeben
                 { "df_cow_done", "She has been milked already. Come back later." },
                 { "df_cow_hungry", "The cow is hungry. Feed her Barley or Flax first." },
                 { "item_df_boonekamp", "Schroeders Boonekamp" },
-                { "item_df_boonekamp_desc", "Herbal bitter from Verl: 34 herbs, roots and fruits, 42 % vol. \"For cold beer and good food.\" More regeneration, a lot more after a feast." },
+                { "item_df_boonekamp_desc", "Herbal bitter from Verl: 34 herbs, roots and fruits, 42 % vol. \"For cold beer and good food.\" More regeneration, even more with a feast, mead or barley wine." },
                 { "se_df_boonekamp", "Verler Heimatwasser" },
-                { "se_df_boonekamp_tooltip", "Herbal, bitter and warming. Your stomach thanks you. Much stronger after a hearty meal." },
+                { "se_df_boonekamp_tooltip", "Herbal, bitter and warming. Your stomach thanks you. Stronger with a hearty meal, a mead or barley wine." },
                 { "se_df_boonekamp_start", "Prost!" },
                 { "se_df_boonekamp_stop", "The warmth fades." },
                 { "item_df_doener", "Döner Meat" },
@@ -150,9 +150,9 @@ namespace VerlerLeben
                 { "df_cow_done", "Sie wurde schon gemolken. Komm später wieder." },
                 { "df_cow_hungry", "Die Kuh hat Hunger. Füttere sie zuerst mit Gerste oder Flachs." },
                 { "item_df_boonekamp", "Schroeders Boonekamp" },
-                { "item_df_boonekamp_desc", "Kräuterbitter aus Verl: 34 Kräuter, Wurzeln und Früchte, 42 % Vol. „Zu kühlem Bier und gutem Essen.“ Mehr Regeneration, nach einem Feast deutlich mehr." },
+                { "item_df_boonekamp_desc", "Kräuterbitter aus Verl: 34 Kräuter, Wurzeln und Früchte, 42 % Vol. „Zu kühlem Bier und gutem Essen.“ Mehr Regeneration, noch mehr mit Feast, Met oder Gerstenwein." },
                 { "se_df_boonekamp", "Verler Heimatwasser" },
-                { "se_df_boonekamp_tooltip", "Herb, kräuterig und wärmend. Der Magen dankt es dir. Nach deftigem Essen noch viel stärker." },
+                { "se_df_boonekamp_tooltip", "Herb, kräuterig und wärmend. Der Magen dankt es dir. Stärker mit deftigem Essen, Met oder Gerstenwein." },
                 { "se_df_boonekamp_start", "Prost!" },
                 { "se_df_boonekamp_stop", "Die Wärme lässt nach." },
                 { "item_df_doener", "Dönerfleisch" },
@@ -264,8 +264,12 @@ namespace VerlerLeben
             effect.m_stopMessage = $"$se_{drink.Token}_stop";
             effect.m_healthRegenMultiplier = 1f + drink.HealthRegenBonus / 100f;
             effect.m_staminaRegenMultiplier = 1f + drink.StaminaRegenBonus / 100f;
-            effect.FeastHealthRegenMultiplier = 1f + drink.FeastHealthRegenBonus / 100f;
-            effect.FeastStaminaRegenMultiplier = 1f + drink.FeastStaminaRegenBonus / 100f;
+            effect.FeastHealth = drink.FeastHealthRegenBonus / 100f;
+            effect.FeastStamina = drink.FeastStaminaRegenBonus / 100f;
+            effect.MeadHealth = drink.MeadHealthRegenBonus / 100f;
+            effect.MeadStamina = drink.MeadStaminaRegenBonus / 100f;
+            effect.BeerHealth = drink.BeerHealthRegenBonus / 100f;
+            effect.BeerStamina = drink.BeerStaminaRegenBonus / 100f;
             if (baseEffect != null)
             {
                 effect.m_startEffects = baseEffect.m_startEffects;
