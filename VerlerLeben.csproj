@@ -4,7 +4,7 @@
     <AssemblyName>VerlerLeben</AssemblyName>
     <RootNamespace>VerlerLeben</RootNamespace>
     <!-- Keep in sync with VerlerLebenPlugin.PluginVersion. -->
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
     <TargetFramework>net462</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
@@ -44,8 +44,12 @@
     <Reference Include="$(ManagedDir)/UnityEngine.dll" Private="false" />
     <Reference Include="$(ManagedDir)/UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="$(ManagedDir)/UnityEngine.AssetBundleModule.dll" Private="false" />
+    <Reference Include="$(ManagedDir)/UnityEngine.ParticleSystemModule.dll" Private="false" />
     <Reference Include="$(ManagedDir)/assembly_valheim.dll" Private="false" />
+    <Reference Include="$(ManagedDir)/assembly_utils.dll" Private="false" />
+    <Reference Include="$(ManagedDir)/assembly_guiutils.dll" Private="false" />
     <Reference Include="$(ValheimDir)/BepInEx/core/BepInEx.dll" Private="false" />
+    <Reference Include="$(ValheimDir)/BepInEx/core/0Harmony.dll" Private="false" />
     <Reference Include="$(PluginsDir)/ValheimModding-Jotunn/Jotunn.dll" Condition="Exists('$(PluginsDir)/ValheimModding-Jotunn/Jotunn.dll')" Private="false" />
     <Reference Include="$(PluginsDir)/Jotunn.dll" Condition="Exists('$(PluginsDir)/Jotunn.dll')" Private="false" />
   </ItemGroup>

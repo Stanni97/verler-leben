@@ -20,30 +20,50 @@ In Valheim gibt es Feasts: ein großes Festmahl aus vielen kleinen Speisen. Du s
 | **Kaunitzer Teller**: Döner und Pommes in der Aluschale, dick mit Käse überbacken. Ein Leben-Essen (rot) | 100 | 50 | 7 | 60 Min. | 10 |
 | **Spexarder Pizza**: deftige, fettige Pizza mit ordentlich Dönerfleisch. Ausgeglichen und sehr sättigend | 80 | 80 | 6 | 80 Min. | 10 |
 
-Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minuten, das der Nebelwelt 65/65 und das von Ashlands 75/75, jeweils 50 Minuten. Dafür brauchen die Gerichte Zutaten aus den Ebenen, den Bergen und der Nebelwelt, die sich aber fast alle farmen lassen.
+Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minuten, das der Nebelwelt 65/65 und das von Ashlands 75/75, jeweils 50 Minuten. Dafür brauchen die Gerichte Zutaten aus den Ebenen, den Bergen und der Nebelwelt. Fleisch und Käse kommen von der Kuh, die du selbst hältst.
+
+## Die Kuh
+
+In den **Wiesen** laufen jetzt Kühe herum, schwarz-weiß gefleckt und kleiner als Lox. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
+
+- **Zähmen:** Wirf Gerste oder Flachs in ihre Nähe und halte Abstand. Nach etwa 5 Minuten ist sie zahm (ein Lox braucht 30).
+- **Melken:** Eine zahme, satte Kuh streichelst du mit **E**. Statt „Streicheln“ steht dort „Melken“. Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch.
+- **Züchten:** Zwei zahme Kühe, regelmäßig gefüttert und nahe beieinander, bekommen Kälber. Das Kalb wächst nach etwa 20 Minuten heran.
+- **Schlachten:** Sie droppt 2 bis 3 Rindfleisch und etwas Lederreste.
 
 ## Herstellung
 
-Fast alles lässt sich farmen: Lox und Wölfe kannst du zähmen und züchten, Gerste, Zwiebeln und Karotten pflanzen, Jotunn-Pilze und Magecap-Pilze in der Nebelwelt anbauen. Nur das Berg-Gewürz kaufst du bei der Sumpfhexe, wie bei den Feasts aus dem Hauptspiel, und es wird nur einmal pro Feast gebraucht.
-
 1. **Zutaten** am Essenszubereitungstisch (Food Preparation Table) herstellen:
 
-   | Zutat | Rezept | Ergibt |
+   | Zutat | Woher / Rezept | Ergibt |
    | --- | --- | --- |
-   | Dönerfleisch | 1 gebratenes Loxfleisch, 1 gebratenes Wolfsfleisch, 1 Zwiebel | 3 |
-   | Käse | 2 Gerste (Gerstenkäse aus Gerstenmilch, wie die Hafermilch im Norden) | 2 |
+   | Milch | von der zahmen Kuh melken | |
+   | Rindfleisch | von der Kuh | |
+   | Dönerfleisch | 1 Rindfleisch, 2 gebratenes Wolfsfleisch, 1 Berg-Gewürz | 3 |
+   | Käse | 2 Milch | 3 |
 
 2. **Rohes Gericht** am Essenszubereitungstisch herstellen:
 
    | Gericht | Rezept |
    | --- | --- |
-   | Kaunitzer Teller (roh) | 4 Dönerfleisch, 3 Käse, 4 Karotten (die Pommes), 1 Jotunn-Pilz, 1 Berg-Gewürz |
-   | Spexarder Pizza (roh) | 3 Brotteig, 6 Dönerfleisch, 4 Käse, 2 Zwiebeln, 1 Magecap-Pilz, 1 Berg-Gewürz |
+   | Kaunitzer Teller (roh) | 6 Dönerfleisch, 4 Käse, 5 Karotten (die Pommes), 3 Zwiebeln, 2 Jotunn-Pilze, 1 Berg-Gewürz |
+   | Spexarder Pizza (roh) | 4 Brotteig, 8 Dönerfleisch, 6 Käse, 4 Wolkenbeeren (die Soße), 2 Magecap-Pilze, 2 Zwiebeln, 1 Berg-Gewürz |
 
 3. **Backen** im Steinofen (Stone Oven), 60 Sekunden. Heraus kommt das fertige Gericht.
 4. Mit dem **Servierteller** auf den Tisch stellen und gemeinsam essen.
 
-Alle Rezepte, Stationen, Werte und Backzeiten lassen sich in der Config ändern (siehe [Konfiguration](#konfiguration)).
+Das Berg-Gewürz gibt es nicht zu farmen, es kommt wie bei den Feasts aus dem Hauptspiel von der Sumpfhexe. Alle Rezepte, Stationen, Werte und Backzeiten lassen sich in der Config ändern (siehe [Konfiguration](#konfiguration)).
+
+## Schroeders Boonekamp
+
+Der **Verler Boonekamp** der Likör Manufaktur Schroeders vom Kirchplatz in Verl (Rezept seit 1798) ist ein Magenbitter aus 34 Kräutern, Wurzeln und Früchten mit 42 % Vol., in Verl liebevoll „Verler Heimatwasser“ genannt. Der Hersteller empfiehlt ihn „zu kühlem Bier und gutem Essen“. Im Spiel ist er der Verdauungsschnaps nach einem deftigen Feast:
+
+| Wirkung | Wert |
+| --- | --- |
+| Lebens- und Ausdauer-Regeneration | +30 % / +20 % für 5 Minuten |
+| **Während ein Teller oder eine Pizza als Essen aktiv ist** | **+80 % / +50 %** |
+
+Gebraut am **Kessel**: 3 Gerste, 2 Distel, 2 Löwenzahn, 1 Honig, 1 Berg-Gewürz ergeben 2 Flaschen. Er wirkt zusätzlich zu Mets, beides zählt.
 
 ## Voraussetzungen
 
@@ -119,6 +139,10 @@ Die Abschnitte `[Teller]` und `[Pizza]` (die Feasts):
 
 Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`.
 
+Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie `FeastHealthRegenBonusPercent` und `FeastStaminaRegenBonusPercent` für den Bonus nach einem Feast.
+
+Der Abschnitt `[Cow]` schaltet die Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
+
 Die Prefab-Namen der Vanilla-Zutaten stehen in der [Jotunn-Itemliste](https://valheim-modding.github.io/Jotunn/data/objects/item-list.html).
 
 ## Selbst bauen
@@ -162,6 +186,10 @@ Die Mod nutzt [Jotunn](https://github.com/Valheim-Modding/Jotunn) und klont die 
 ## Automatische Updates
 
 Diese Mod wird vom [Bifrost Updater](https://github.com/Stanni97/bifrost-updater) mit aktualisiert, wenn er installiert ist. Er prüft beim Spielstart das neueste GitHub-Release. Die Mod nennt dafür ihr Repository in der DLL. Der Updater ist optional, die Mod läuft auch ohne.
+
+## Hinweis
+
+Inoffizieller Fan-Mod ohne Verbindung zu Schroeders Likör Manufaktur oder anderen genannten Firmen. Die Namen stehen für Orte und Dinge aus Verl in Ostwestfalen, die Icons sind eigene Zeichnungen. Der Modname erinnert an das „Verler Leben“, die Kirmes in Verl.
 
 ## Lizenz
 

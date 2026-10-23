@@ -1,7 +1,8 @@
 """Draws the item icons for Verler Leben.
 
 Usage: python3 make_icons.py OUT_DIR [SIZE]
-  Writes doener.png, kaese.png, teller.png, tellerraw.png, pizza.png and pizzaraw.png.
+  Writes doener.png, kaese.png, teller.png, tellerraw.png, pizza.png, pizzaraw.png, milch.png,
+  rindfleisch.png and boonekamp.png.
   SIZE defaults to 128 (item icons).
 
 Everything is drawn from simple shapes. The baked dishes follow photos of the real thing:
@@ -12,7 +13,7 @@ import math
 import os
 import random
 import sys
-from PIL import Image, ImageChops, ImageDraw, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 OUT_DIR = sys.argv[1]
 SIZE = int(sys.argv[2]) if len(sys.argv) > 2 else 128
@@ -259,6 +260,66 @@ def draw_kaese():
     return shade(layer, 0.2)
 
 
+def draw_milch():
+    """Glass milk bottle with a blue cap and a cow-patch label."""
+    rng = random.Random(41)
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    d.rounded_rectangle([170, 170, 342, 472], radius=44, fill=(246, 249, 252, 255), outline=(150, 168, 190, 255), width=8)
+    d.rectangle([214, 92, 298, 196], fill=(238, 243, 249, 255), outline=(150, 168, 190, 255), width=6)
+    d.rounded_rectangle([200, 52, 312, 106], radius=14, fill=(58, 110, 196, 255), outline=(30, 60, 120, 255), width=5)
+    body = new_layer()
+    bd = ImageDraw.Draw(body)
+    for cx, cy, rx, ry in ((228, 250, 34, 26), (300, 330, 30, 38), (214, 410, 28, 24)):
+        blob(bd, cx, cy, rx, ry, (36, 38, 46, 255), rng, jitter=0.35)
+    mask = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([178, 178, 334, 464], radius=38, fill=255)
+    layer.alpha_composite(clip(body, mask))
+    d.rectangle([178, 330, 334, 372], fill=(70, 124, 206, 255))
+    d.line([196, 190, 196, 300], fill=(255, 255, 255, 200), width=10)      # glass highlight
+    return shade(layer, 0.18)
+
+
+def draw_rindfleisch():
+    """Raw beef: a red cut with fat marbling and a white fat rim."""
+    rng = random.Random(51)
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    blob(d, 256, 262, 196, 150, (232, 214, 196, 255), rng, jitter=0.18, rot=0.2)      # fat rim
+    blob(d, 252, 258, 178, 132, (176, 42, 54, 255), rng, jitter=0.16, rot=0.2)        # meat
+    blob(d, 232, 232, 120, 80, (200, 66, 74, 255), rng, jitter=0.2, rot=0.3)          # lighter middle
+    for _ in range(14):                                                                # marbling
+        x, y = rng.uniform(150, 360), rng.uniform(190, 330)
+        a = rng.uniform(-0.8, 0.8)
+        d.line([x, y, x + math.cos(a) * rng.uniform(30, 70), y + math.sin(a) * rng.uniform(14, 34)],
+               fill=(246, 228, 218, 255), width=rng.randint(4, 8))
+    blob(d, 330, 220, 26, 20, (250, 244, 236, 255), rng, jitter=0.2)                   # bone end
+    return shade(layer, 0.25)
+
+
+def draw_boonekamp():
+    """Dark herbal bitter bottle with a cream label and a green band."""
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    d.rounded_rectangle([156, 196, 356, 476], radius=34, fill=(52, 34, 22, 255), outline=(20, 12, 8, 255), width=6)
+    d.polygon([(192, 196), (320, 196), (292, 128), (220, 128)], fill=(52, 34, 22, 255))
+    d.rectangle([222, 66, 290, 140], fill=(60, 40, 26, 255), outline=(20, 12, 8, 255), width=5)
+    d.rounded_rectangle([210, 44, 302, 82], radius=10, fill=(206, 166, 60, 255), outline=(120, 90, 20, 255), width=4)
+    d.rectangle([166, 276, 346, 430], fill=(240, 228, 196, 255), outline=(90, 70, 40, 255), width=4)
+    d.rectangle([166, 276, 346, 312], fill=(44, 98, 60, 255))
+    d.rectangle([166, 394, 346, 430], fill=(44, 98, 60, 255))
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/TTF/DejaVuSerif-Bold.ttf", 38)
+    except OSError:
+        font = ImageFont.load_default()
+    for text, y in (("BOONE", 316), ("KAMP", 354)):
+        box = d.textbbox((0, 0), text, font=font)
+        d.text((256 - (box[0] + box[2]) / 2, y), text, font=font, fill=(44, 98, 60, 255))
+    d.ellipse([234, 236, 278, 280], fill=(206, 166, 60, 255), outline=(120, 90, 20, 255), width=3)
+    d.line([212, 214, 212, 330], fill=(255, 255, 255, 70), width=10)                   # glass highlight
+    return shade(layer, 0.2)
+
+
 def finish(layer):
     """Dark outline and soft drop shadow, like vanilla Valheim icons."""
     alpha = layer.getchannel("A")
@@ -274,7 +335,8 @@ def finish(layer):
 os.makedirs(OUT_DIR, exist_ok=True)
 for name, layer in (("doener", draw_doener()), ("kaese", draw_kaese()),
                     ("teller", draw_tray(True)), ("tellerraw", draw_tray(False)),
-                    ("pizza", draw_pizza(True)), ("pizzaraw", draw_pizza(False))):
+                    ("pizza", draw_pizza(True)), ("pizzaraw", draw_pizza(False)),
+                    ("milch", draw_milch()), ("rindfleisch", draw_rindfleisch()), ("boonekamp", draw_boonekamp())):
     path = os.path.join(OUT_DIR, f"{name}.png")
     finish(layer).save(path)
     print("wrote", path)

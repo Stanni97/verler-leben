@@ -75,4 +75,54 @@ namespace VerlerLeben
             Servings = config.Bind(s, "Servings", Servings, "How many times the feast can be eaten from before it is gone.").Value;
         }
     }
+
+    /// <summary>An item that only drops or is found, without a recipe (milk, beef).</summary>
+    internal sealed class DropItem
+    {
+        public string Key;
+        public string PrefabName;
+        public string BasePrefab;
+        public float Weight = 0.5f;
+        public int StackSize = 30;
+
+        public string Token => "df_" + Key.ToLowerInvariant();
+        public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
+    }
+
+    /// <summary>Schroeders Boonekamp, a drink with a regeneration buff that is stronger after a feast.</summary>
+    internal sealed class Drink
+    {
+        public string Key = "Boonekamp";
+        public string PrefabName = "DF_Boonekamp";
+
+        public bool Enabled = true;
+        public string CraftingStation = nameof(CraftingStations.Cauldron);
+        public string Ingredients = "Barley:3,Thistle:2,Dandelion:2,Honey:1,SpiceMountains:1";
+        public int Amount = 2;
+        public float Duration = 300f;
+        public int HealthRegenBonus = 30;
+        public int StaminaRegenBonus = 20;
+        public int FeastHealthRegenBonus = 80;
+        public int FeastStaminaRegenBonus = 50;
+
+        public string Token => "df_" + Key.ToLowerInvariant();
+        public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
+
+        public void Bind(ConfigFile config)
+        {
+            string s = Key;
+            Enabled = config.Bind(s, "Enabled", Enabled, "Adds the drink to the game.").Value;
+            CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
+                new ConfigDescription("Where the drink is brewed.", CraftingStations.GetAcceptableValueList())).Value;
+            Ingredients = config.Bind(s, "Ingredients", Ingredients, "Comma separated list of ItemPrefab:Amount.").Value;
+            Amount = config.Bind(s, "Amount", Amount, "Bottles produced per craft.").Value;
+            Duration = config.Bind(s, "DurationSeconds", Duration, "How long the buff lasts, in seconds.").Value;
+            HealthRegenBonus = config.Bind(s, "HealthRegenBonusPercent", HealthRegenBonus, "Faster health regeneration, in percent.").Value;
+            StaminaRegenBonus = config.Bind(s, "StaminaRegenBonusPercent", StaminaRegenBonus, "Faster stamina regeneration, in percent.").Value;
+            FeastHealthRegenBonus = config.Bind(s, "FeastHealthRegenBonusPercent", FeastHealthRegenBonus,
+                "Faster health regeneration while a feast of this mod is active, in percent.").Value;
+            FeastStaminaRegenBonus = config.Bind(s, "FeastStaminaRegenBonusPercent", FeastStaminaRegenBonus,
+                "Faster stamina regeneration while a feast of this mod is active, in percent.").Value;
+        }
+    }
 }

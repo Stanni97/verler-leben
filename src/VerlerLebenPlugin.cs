@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using HarmonyLib;
 using Jotunn.Configs;
 using Jotunn.Entities;
 using Jotunn.Managers;
@@ -30,16 +31,26 @@ namespace VerlerLeben
             new Ingredient
             {
                 Key = "Doener", PrefabName = "DF_Doener", BasePrefab = "LoxMeat",
-                // Lox (Plains) and wolf (Mountains) can both be tamed and bred, onions are planted.
-                Ingredients = "CookedLoxMeat:1,CookedWolfMeat:1,Onion:1", Amount = 3,
+                // Beef of the cow, wolf meat from the Mountains and the Mountains spice.
+                Ingredients = "DF_Rindfleisch:1,CookedWolfMeat:2,SpiceMountains:1", Amount = 3,
             },
             new Ingredient
             {
                 Key = "Kaese", PrefabName = "DF_Kaese", BasePrefab = "BreadDough",
-                // Barley milk, like the oat milk of the Deep North. Barley is planted in the Plains.
-                Ingredients = "Barley:2", Amount = 2,
+                // Milk of the cow.
+                Ingredients = "DF_Milch:2", Amount = 3,
             },
         };
+
+        // Dropped by the cow or made from her: milk and beef.
+        private readonly DropItem[] _drops =
+        {
+            new DropItem { Key = "Milch", PrefabName = "DF_Milch", BasePrefab = "MeadStaminaMinor", Weight = 0.5f, StackSize = 20 },
+            new DropItem { Key = "Rindfleisch", PrefabName = "DF_Rindfleisch", BasePrefab = "LoxMeat", Weight = 0.5f, StackSize = 30 },
+        };
+
+        private readonly CowSettings _cow = new CowSettings();
+        private readonly Drink _boonekamp = new Drink();
 
         private readonly Dish[] _dishes =
         {
@@ -48,7 +59,7 @@ namespace VerlerLeben
             {
                 Key = "Teller", RawPrefab = "DF_TellerRaw", MaterialPrefab = "DF_Teller_Material", FeastPrefab = "DF_FeastTeller",
                 BaseMaterial = "FeastMeadows_Material", BaseFeast = "FeastMeadows",
-                Ingredients = "DF_Doener:4,DF_Kaese:3,Carrot:4,MushroomJotunPuffs:1,SpiceMountains:1",
+                Ingredients = "DF_Doener:6,DF_Kaese:4,Carrot:5,Onion:3,MushroomJotunPuffs:2,SpiceMountains:1",
                 Health = 100f, Stamina = 50f, Regen = 7f, BurnSeconds = 3600f,
             },
             // Balanced and very filling: a big pizza with plenty of Döner meat.
@@ -56,7 +67,7 @@ namespace VerlerLeben
             {
                 Key = "Pizza", RawPrefab = "DF_PizzaRaw", MaterialPrefab = "DF_Pizza_Material", FeastPrefab = "DF_FeastPizza",
                 BaseMaterial = "FeastBlackforest_Material", BaseFeast = "FeastBlackforest",
-                Ingredients = "BreadDough:3,DF_Doener:6,DF_Kaese:4,Onion:2,MushroomMagecap:1,SpiceMountains:1",
+                Ingredients = "BreadDough:4,DF_Doener:8,DF_Kaese:6,Cloudberry:4,MushroomMagecap:2,Onion:2,SpiceMountains:1",
                 Health = 80f, Stamina = 80f, Regen = 6f, BurnSeconds = 4800f,
             },
         };
@@ -73,6 +84,12 @@ namespace VerlerLeben
                 dish.Bind(Config);
             }
 
+            _cow.Bind(Config);
+            _boonekamp.Bind(Config);
+
+            SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza" });
+            new Harmony(PluginGUID).PatchAll(typeof(VerlerLebenPlugin).Assembly);
+
             AddLocalizations();
             PrefabManager.OnVanillaPrefabsAvailable += AddContent;
         }
@@ -86,6 +103,23 @@ namespace VerlerLeben
 
             loc.AddTranslation("English", new Dictionary<string, string>
             {
+                { "item_df_milch", "Milk" },
+                { "item_df_milch_desc", "Fresh from the cow. Becomes cheese at the preparation table." },
+                { "item_df_rindfleisch", "Beef" },
+                { "item_df_rindfleisch_desc", "Raw beef from a cow. The base of Döner meat." },
+                { "df_kuh", "Cow" },
+                { "df_kalb", "Calf" },
+                { "df_milk_action", "Milk" },
+                { "df_cow_ready", "Milk ready" },
+                { "df_cow_done_short", "Milked for today" },
+                { "df_cow_done", "She has been milked already. Come back later." },
+                { "df_cow_hungry", "The cow is hungry. Feed her Barley or Flax first." },
+                { "item_df_boonekamp", "Schroeders Boonekamp" },
+                { "item_df_boonekamp_desc", "Herbal bitter from Verl: 34 herbs, roots and fruits, 42 % vol. \"For cold beer and good food.\" More regeneration, a lot more after a feast." },
+                { "se_df_boonekamp", "Verler Heimatwasser" },
+                { "se_df_boonekamp_tooltip", "Herbal, bitter and warming. Your stomach thanks you. Much stronger after a hearty meal." },
+                { "se_df_boonekamp_start", "Prost!" },
+                { "se_df_boonekamp_stop", "The warmth fades." },
                 { "item_df_doener", "Döner Meat" },
                 { "item_df_doener_desc", "Thin slices of wolf and lox meat from the spit, with onions. The base of every good feast." },
                 { "item_df_kaese", "Cheese" },
@@ -104,6 +138,23 @@ namespace VerlerLeben
 
             loc.AddTranslation("German", new Dictionary<string, string>
             {
+                { "item_df_milch", "Milch" },
+                { "item_df_milch_desc", "Frisch von der Kuh. Wird am Zubereitungstisch zu Käse." },
+                { "item_df_rindfleisch", "Rindfleisch" },
+                { "item_df_rindfleisch_desc", "Rohes Rindfleisch von der Kuh. Die Grundlage fürs Dönerfleisch." },
+                { "df_kuh", "Kuh" },
+                { "df_kalb", "Kalb" },
+                { "df_milk_action", "Melken" },
+                { "df_cow_ready", "Milch bereit" },
+                { "df_cow_done_short", "Heute schon gemolken" },
+                { "df_cow_done", "Sie wurde schon gemolken. Komm später wieder." },
+                { "df_cow_hungry", "Die Kuh hat Hunger. Füttere sie zuerst mit Gerste oder Flachs." },
+                { "item_df_boonekamp", "Schroeders Boonekamp" },
+                { "item_df_boonekamp_desc", "Kräuterbitter aus Verl: 34 Kräuter, Wurzeln und Früchte, 42 % Vol. „Zu kühlem Bier und gutem Essen.“ Mehr Regeneration, nach einem Feast deutlich mehr." },
+                { "se_df_boonekamp", "Verler Heimatwasser" },
+                { "se_df_boonekamp_tooltip", "Herb, kräuterig und wärmend. Der Magen dankt es dir. Nach deftigem Essen noch viel stärker." },
+                { "se_df_boonekamp_start", "Prost!" },
+                { "se_df_boonekamp_stop", "Die Wärme lässt nach." },
                 { "item_df_doener", "Dönerfleisch" },
                 { "item_df_doener_desc", "Dünne Scheiben Wolfs- und Loxfleisch vom Spieß, mit Zwiebeln. Die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
@@ -139,6 +190,35 @@ namespace VerlerLeben
                 }
             }
 
+            if (_cow.Enabled)
+            {
+                try
+                {
+                    foreach (DropItem drop in _drops)
+                    {
+                        AddDropItem(drop);
+                    }
+
+                    Cows.Add(_cow, Logger);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Failed to add the cow: {e}");
+                }
+            }
+
+            if (_boonekamp.Enabled)
+            {
+                try
+                {
+                    AddDrink(_boonekamp);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Failed to add {_boonekamp.PrefabName}: {e}");
+                }
+            }
+
             foreach (Dish dish in _dishes.Where(d => d.Enabled))
             {
                 try
@@ -150,6 +230,65 @@ namespace VerlerLeben
                     Logger.LogError($"Failed to add {dish.FeastPrefab}: {e}");
                 }
             }
+        }
+
+        private void AddDropItem(DropItem drop)
+        {
+            var item = new CustomItem(drop.PrefabName, drop.BasePrefab);
+            ItemDrop.ItemData.SharedData shared = item.ItemDrop.m_itemData.m_shared;
+            shared.m_name = $"$item_{drop.Token}";
+            shared.m_description = $"$item_{drop.Token}_desc";
+            shared.m_icons = new[] { LoadIcon(drop.IconResource) };
+            shared.m_weight = drop.Weight;
+            shared.m_maxStackSize = drop.StackSize;
+            MakePlainMaterial(item.ItemDrop);
+            ItemManager.Instance.AddItem(item);
+        }
+
+        private void AddDrink(Drink drink)
+        {
+            Sprite icon = LoadIcon(drink.IconResource);
+            StatusEffect baseEffect = PrefabManager.Instance.GetPrefab("MeadStaminaMinor")
+                .GetComponent<ItemDrop>().m_itemData.m_shared.m_consumeStatusEffect;
+
+            var effect = ScriptableObject.CreateInstance<SE_Boonekamp>();
+            effect.name = "SE_" + drink.PrefabName;
+            effect.m_name = $"$se_{drink.Token}";
+            effect.m_tooltip = $"$se_{drink.Token}_tooltip";
+            effect.m_category = "df_boonekamp";   // its own category, so it stacks with the meads
+            effect.m_icon = icon;
+            effect.m_ttl = drink.Duration;
+            effect.m_startMessageType = MessageHud.MessageType.Center;
+            effect.m_startMessage = $"$se_{drink.Token}_start";
+            effect.m_stopMessageType = MessageHud.MessageType.TopLeft;
+            effect.m_stopMessage = $"$se_{drink.Token}_stop";
+            effect.m_healthRegenMultiplier = 1f + drink.HealthRegenBonus / 100f;
+            effect.m_staminaRegenMultiplier = 1f + drink.StaminaRegenBonus / 100f;
+            effect.FeastHealthRegenMultiplier = 1f + drink.FeastHealthRegenBonus / 100f;
+            effect.FeastStaminaRegenMultiplier = 1f + drink.FeastStaminaRegenBonus / 100f;
+            if (baseEffect != null)
+            {
+                effect.m_startEffects = baseEffect.m_startEffects;
+                effect.m_stopEffects = baseEffect.m_stopEffects;
+            }
+
+            ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(effect, false));
+
+            var config = new ItemConfig
+            {
+                Name = $"$item_{drink.Token}",
+                Description = $"$item_{drink.Token}_desc",
+                CraftingStation = CraftingStations.GetInternalName(drink.CraftingStation),
+                Amount = Mathf.Max(1, drink.Amount),
+                Requirements = ParseRequirements(drink.PrefabName, drink.Ingredients),
+                Icon = icon,
+                Weight = 0.5f,
+                StackSize = 20,
+            };
+            var item = new CustomItem(drink.PrefabName, "MeadStaminaMinor", config);
+            item.ItemDrop.m_itemData.m_shared.m_consumeStatusEffect = effect;
+            item.ItemPrefab.transform.localScale *= 0.85f;
+            ItemManager.Instance.AddItem(item);
         }
 
         private void AddIngredient(Ingredient ingredient)
