@@ -130,7 +130,7 @@ namespace VerlerLeben
 
             if (material.HasProperty("_Glossiness"))
             {
-                material.SetFloat("_Glossiness", 0.03f);   // matt coat
+                material.SetFloat("_Glossiness", 0f);   // matt coat
             }
 
             return material;
