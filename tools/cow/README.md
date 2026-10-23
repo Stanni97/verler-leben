@@ -9,10 +9,15 @@ Neu erzeugen:
 1. `Cow.blend` aus dem Paket herunterladen.
 2. Mesh, Materialien und Knochengewichte exportieren:
    `blender -b --disable-autoexec Cow.blend --python export_cow.py -- cow_src.json`
-3. Lox-Skelett aus den Spieldaten auslesen (`loxskel.json` mit Knochen und Bind-Positionen des Lox-Körpers, z. B. mit UnityPy).
+3. Lox-Skelett aus den Spieldaten auslesen (braucht UnityPy und numpy):
+   `python3 export_lox_skeleton.py ~/.local/share/Steam/steamapps/common/Valheim loxskel.json`
+
+`cow_src.json` und `loxskel.json` liegen schon hier, die Schritte 1 bis 3 sind nur nötig, wenn sich das Modell oder der Lox ändert.
 4. Ausrichten und schreiben:
    `python3 build_cow.py cow_src.json loxskel.json ../../Assets/cow_mesh.bin ../../Assets/cowpalette.png preview.json`
 5. Vorschau rendern: `blender -b --factory-startup --python preview.py -- preview.json prev 1`
 
 `build_cow.py` skaliert die Kuh auf den Beinabstand des Lox, spiegelt X wie Unitys FBX-Import und ordnet ihre
-Knochen den Lox-Knochen zu (Kopf, Hals, Rumpf, Beine). Die Kuh bewegt sich dann mit den Lox-Animationen.
+Knochen den Lox-Knochen zu (Kopf, Hals, Rumpf, Beine). Weil der Lox breiter steht und die Beine tiefer beugt, wird
+die Kuh etwas breiter gemacht (`WIDTH`), die Beine rücken auseinander (`SPREAD`), und die Beine werden nach der Höhe
+der Lox-Gelenke gewichtet. Die Kuh bewegt sich dann mit den Lox-Animationen.

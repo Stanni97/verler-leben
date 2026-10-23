@@ -136,6 +136,7 @@ namespace VerlerLeben
                 mesh.boneWeights = weights;
                 mesh.triangles = triangles;
                 mesh.RecalculateNormals();   // vertices are not shared, so the low-poly faces stay flat
+                mesh.RecalculateTangents();  // the creature shader uses a normal map
                 mesh.RecalculateBounds();
                 return mesh;
             }

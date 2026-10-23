@@ -1,5 +1,8 @@
 """Turns the Quaternius cow into a mesh for the Lox skeleton.
-Usage: build_cow.py COW_JSON LOXSKEL_JSON OUT_BIN OUT_PALETTE OUT_PREVIEW_JSON"""
+Usage: build_cow.py COW_JSON LOXSKEL_JSON OUT_BIN OUT_PALETTE OUT_PREVIEW_JSON
+
+The Lox stands wide and bends its legs lower than the cow. So the cow is made a bit wider, its legs are moved
+apart, and the leg vertices are weighted by height to the Lox leg bones: they bend where the Lox bends."""
 import json, struct, sys
 import numpy as np
 from PIL import Image
@@ -38,6 +41,30 @@ s = abs(lox_back - lox_front) / abs(cow_back - cow_front) * float(sys.argv[6] if
 raw *= s
 raw[:, 1] += (lox_front + lox_back) / 2 - s * (cow_front + cow_back) / 2
 raw[:, 2] -= raw[:, 2].min()
+
+WIDTH = 1.3      # a cow is stockier than the slim model
+SPREAD = 0.004   # extra distance of each leg from the middle, in Lox mesh units (Lox legs: 0.019)
+raw[:, 0] *= WIDTH
+
+LEGS = {}        # cow leg groups -> (Lox parent, upper, lower, foot)
+for side, l in (("L", "l"), ("R", "r")):
+    LEGS[("Front", side)] = ([f"FrontLeg.{side}", f"FrontUpLeg.{side}", f"FrontLowLeg.{side}", f"FrontFoot.{side}"],
+                             (f"Shoulder.{l}", f"Frontupperleg.{l}", f"Frontlowerleg.{l}", f"Frontfoot.{l}"))
+    LEGS[("Back", side)] = ([f"BackLeg.{side}", f"BackUpLeg.{side}", f"BackLowLeg.{side}", f"BackFoot.{side}"],
+                            (f"Hip.{l}", f"Backupperleg.{l}", f"Backlowerleg.{l}", f"Backfoot.{l}"))
+
+def leg_of(i):
+    best, amount = None, 0.0
+    for key, (groups, _) in LEGS.items():
+        a = sum(cow["weights"][i].get(g, 0.0) for g in groups)
+        if a > amount:
+            best, amount = key, a
+    return best, min(1.0, amount)
+
+for i in range(len(raw)):
+    key, amount = leg_of(i)
+    if key and amount > 0:
+        raw[i, 0] += np.sign(raw[i, 0]) * SPREAD * amount
 print("scale", s, "bbox", raw.min(0).round(4), raw.max(0).round(4))
 
 # palette
@@ -48,13 +75,36 @@ for i, m in enumerate(cow["mats"]):
     palette.paste(COLORS.get(m, (200, 200, 200)) + (255,), (i * cell, 0, (i + 1) * cell, cell))
 palette.save(sys.argv[4])
 
+BAND = 0.002
+
+def leg_weights(i, key):
+    parent, upper, lower, foot = LEGS[key][1]
+    z = raw[i, 2]
+    knee, ground = bpos[lower][2], bpos[foot][2]
+    if z <= ground + BAND:
+        return {foot: 1.0}
+    if z >= knee + BAND:
+        return {upper: 1.0}
+    if z <= knee - BAND:
+        return {lower: 1.0}
+    t = (z - (knee - BAND)) / (2 * BAND)
+    return {upper: t, lower: 1.0 - t}
+
 def weights_of(i):
+    key, amount = leg_of(i)
     w = {}
-    for g, val in cow["weights"][i].items():
+    if key and amount > 0:
+        for b, val in leg_weights(i, key).items():
+            w[b] = w.get(b, 0) + val * amount
+    rest = 1.0 - (amount if key else 0.0)
+    legs = set(g for groups, _ in LEGS.values() for g in groups)
+    others = {g: v for g, v in cow["weights"][i].items() if g not in legs}
+    total_others = sum(others.values()) or 1.0
+    for g, val in others.items():
         b = MAP.get(g)
         if b is None:
             continue
-        w[b] = w.get(b, 0) + val
+        w[b] = w.get(b, 0) + rest * val / total_others
     top = sorted(w.items(), key=lambda kv: -kv[1])[:4]
     total = sum(v for _, v in top) or 1.0
     top = [(bones.index(b), v / total) for b, v in top]
