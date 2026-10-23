@@ -20,12 +20,12 @@ size = int(args[2]) if len(args) > 2 else 512
 
 COATS = {
     # name: (base coat, patches)
-    # Valheim's sun is bright: a white coat above ~0.65 blooms like a lamp.
-    "schwarzbunt": ((0.62, 0.60, 0.56), (0.035, 0.032, 0.032)),
-    "rotbunt": ((0.62, 0.60, 0.56), (0.33, 0.12, 0.055)),
+    # Valheim's sun is bright: a white coat above ~0.5 blooms like a lamp (the brown coat at 0.4 looks right).
+    "schwarzbunt": ((0.46, 0.45, 0.42), (0.035, 0.032, 0.032)),
+    "rotbunt": ((0.46, 0.45, 0.42), (0.30, 0.11, 0.05)),
     "braun": ((0.40, 0.27, 0.17), (0.30, 0.19, 0.11)),
 }
-PINK = (0.58, 0.34, 0.36)
+PINK = (0.48, 0.28, 0.30)
 HOOF = (0.09, 0.08, 0.075)
 
 arm = bpy.data.objects["Armature"]
