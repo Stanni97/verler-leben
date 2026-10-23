@@ -30,13 +30,14 @@ namespace VerlerLeben
             new Ingredient
             {
                 Key = "Doener", PrefabName = "DF_Doener", BasePrefab = "LoxMeat",
-                // A little lox (Plains), wolf (Mountains) and the Mountains spice.
-                Ingredients = "CookedLoxMeat:1,CookedWolfMeat:2,SpiceMountains:1", Amount = 3,
+                // Lox (Plains) and wolf (Mountains) can both be tamed and bred, onions are planted.
+                Ingredients = "CookedLoxMeat:1,CookedWolfMeat:1,Onion:1", Amount = 3,
             },
             new Ingredient
             {
                 Key = "Kaese", PrefabName = "DF_Kaese", BasePrefab = "BreadDough",
-                Ingredients = "ChickenEgg:2", Amount = 3,
+                // Barley milk, like the oat milk of the Deep North. Barley is planted in the Plains.
+                Ingredients = "Barley:2", Amount = 2,
             },
         };
 
@@ -47,7 +48,7 @@ namespace VerlerLeben
             {
                 Key = "Teller", RawPrefab = "DF_TellerRaw", MaterialPrefab = "DF_Teller_Material", FeastPrefab = "DF_FeastTeller",
                 BaseMaterial = "FeastMeadows_Material", BaseFeast = "FeastMeadows",
-                Ingredients = "DF_Doener:6,DF_Kaese:4,Carrot:5,Onion:3,MushroomJotunPuffs:2,SpiceMountains:1",
+                Ingredients = "DF_Doener:4,DF_Kaese:3,Carrot:4,MushroomJotunPuffs:1,SpiceMountains:1",
                 Health = 100f, Stamina = 50f, Regen = 7f, BurnSeconds = 3600f,
             },
             // Balanced and very filling: a big pizza with plenty of Döner meat.
@@ -55,7 +56,7 @@ namespace VerlerLeben
             {
                 Key = "Pizza", RawPrefab = "DF_PizzaRaw", MaterialPrefab = "DF_Pizza_Material", FeastPrefab = "DF_FeastPizza",
                 BaseMaterial = "FeastBlackforest_Material", BaseFeast = "FeastBlackforest",
-                Ingredients = "BreadDough:4,DF_Doener:8,DF_Kaese:6,Cloudberry:4,MushroomMagecap:2,Onion:2,SpiceMountains:1",
+                Ingredients = "BreadDough:3,DF_Doener:6,DF_Kaese:4,Onion:2,MushroomMagecap:1,SpiceMountains:1",
                 Health = 80f, Stamina = 80f, Regen = 6f, BurnSeconds = 4800f,
             },
         };
@@ -86,9 +87,9 @@ namespace VerlerLeben
             loc.AddTranslation("English", new Dictionary<string, string>
             {
                 { "item_df_doener", "Döner Meat" },
-                { "item_df_doener_desc", "Thin slices of wolf and a little lox meat from the spit, seasoned with the spice of the mountains. The base of every good feast." },
+                { "item_df_doener_desc", "Thin slices of wolf and lox meat from the spit, with onions. The base of every good feast." },
                 { "item_df_kaese", "Cheese" },
-                { "item_df_kaese_desc", "Melts beautifully. Made from eggs, don't ask." },
+                { "item_df_kaese_desc", "Barley cheese, made from barley milk like the oat milk of the north. Melts beautifully." },
 
                 { "item_df_teller_raw", "Kaunitzer Plate (raw)" },
                 { "item_df_teller_raw_desc", "Döner and fries in an aluminium tray, covered in cheese. Needs to be baked in the stone oven." },
@@ -104,9 +105,9 @@ namespace VerlerLeben
             loc.AddTranslation("German", new Dictionary<string, string>
             {
                 { "item_df_doener", "Dönerfleisch" },
-                { "item_df_doener_desc", "Dünne Scheiben Wolfsfleisch und ein wenig Loxfleisch vom Spieß, gewürzt mit dem Gewürz der Berge. Die Grundlage jedes guten Festmahls." },
+                { "item_df_doener_desc", "Dünne Scheiben Wolfs- und Loxfleisch vom Spieß, mit Zwiebeln. Die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
-                { "item_df_kaese_desc", "Schmilzt wunderbar. Aus Eiern gemacht, frag nicht." },
+                { "item_df_kaese_desc", "Gerstenkäse aus Gerstenmilch, so wie die Hafermilch im Norden. Schmilzt wunderbar." },
 
                 { "item_df_teller_raw", "Kaunitzer Teller (roh)" },
                 { "item_df_teller_raw_desc", "Döner und Pommes in der Aluschale, dick mit Käse bedeckt. Muss im Steinofen gebacken werden." },

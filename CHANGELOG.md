@@ -2,9 +2,12 @@
 
 ## 1.1.1
 
-- Dönerfleisch braucht ein Fleisch weniger und weniger Lox: 1 gebratenes Loxfleisch, 2 gebratenes Wolfsfleisch und Berg-Gewürz statt Nebelwelt-Gewürz (ergibt 3).
-- Käse wird aus 2 Eiern statt aus Loxfleisch gemacht (ergibt 3).
-- Teller und Pizza brauchen zusätzlich 1 Berg-Gewürz.
+- Einfacher zu farmen, fast alle Zutaten lassen sich züchten oder anbauen:
+  - Dönerfleisch: 1 gebratenes Loxfleisch, 1 gebratenes Wolfsfleisch, 1 Zwiebel (ergibt 3), ohne Gewürz.
+  - Käse: 2 Gerste (ergibt 2), Gerstenkäse statt Loxfleisch.
+  - Kaunitzer Teller: 4 Dönerfleisch, 3 Käse, 4 Karotten, 1 Jotunn-Pilz, 1 Berg-Gewürz.
+  - Spexarder Pizza: 3 Brotteig, 6 Dönerfleisch, 4 Käse, 2 Zwiebeln, 1 Magecap-Pilz, 1 Berg-Gewürz.
+- Das Ebenen-Gewürz und das Nebelwelt-Gewürz werden nicht mehr gebraucht, nur noch 1 Berg-Gewürz pro Feast.
 - Bestehende Configs behalten ihre alten Werte. Zum Übernehmen `BepInEx/config/felix.verlerleben.cfg` löschen.
 
 ## 1.1.0

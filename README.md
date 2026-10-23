@@ -20,25 +20,25 @@ In Valheim gibt es Feasts: ein großes Festmahl aus vielen kleinen Speisen. Du s
 | **Kaunitzer Teller**: Döner und Pommes in der Aluschale, dick mit Käse überbacken. Ein Leben-Essen (rot) | 100 | 50 | 7 | 60 Min. | 10 |
 | **Spexarder Pizza**: deftige, fettige Pizza mit ordentlich Dönerfleisch. Ausgeglichen und sehr sättigend | 80 | 80 | 6 | 80 Min. | 10 |
 
-Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minuten, das der Nebelwelt 65/65 und das von Ashlands 75/75, jeweils 50 Minuten. Dafür brauchen die Gerichte Zutaten aus den Ebenen, den Bergen und der Nebelwelt.
+Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minuten, das der Nebelwelt 65/65 und das von Ashlands 75/75, jeweils 50 Minuten. Dafür brauchen die Gerichte Zutaten aus den Ebenen, den Bergen und der Nebelwelt, die sich aber fast alle farmen lassen.
 
 ## Herstellung
 
-Die Zutaten kommen aus den Ebenen (Lox, Brotteig, Wolkenbeeren), den Bergen (Wolf, Zwiebeln, Gewürz) und der Nebelwelt (Pilze). Zuerst die Zutaten, dann das rohe Gericht, dann ab in den Ofen.
+Fast alles lässt sich farmen: Lox und Wölfe kannst du zähmen und züchten, Gerste, Zwiebeln und Karotten pflanzen, Jotunn-Pilze und Magecap-Pilze in der Nebelwelt anbauen. Nur das Berg-Gewürz kaufst du bei der Sumpfhexe, wie bei den Feasts aus dem Hauptspiel, und es wird nur einmal pro Feast gebraucht.
 
 1. **Zutaten** am Essenszubereitungstisch (Food Preparation Table) herstellen:
 
    | Zutat | Rezept | Ergibt |
    | --- | --- | --- |
-   | Dönerfleisch | 1 gebratenes Loxfleisch, 2 gebratenes Wolfsfleisch, 1 Berg-Gewürz | 3 |
-   | Käse | 2 Eier (frag nicht) | 3 |
+   | Dönerfleisch | 1 gebratenes Loxfleisch, 1 gebratenes Wolfsfleisch, 1 Zwiebel | 3 |
+   | Käse | 2 Gerste (Gerstenkäse aus Gerstenmilch, wie die Hafermilch im Norden) | 2 |
 
 2. **Rohes Gericht** am Essenszubereitungstisch herstellen:
 
    | Gericht | Rezept |
    | --- | --- |
-   | Kaunitzer Teller (roh) | 6 Dönerfleisch, 4 Käse, 5 Karotten (die Pommes), 3 Zwiebeln, 2 Jotunn-Pilze, 1 Berg-Gewürz |
-   | Spexarder Pizza (roh) | 4 Brotteig, 8 Dönerfleisch, 6 Käse, 4 Wolkenbeeren (die Soße), 2 Magecap-Pilze, 2 Zwiebeln, 1 Berg-Gewürz |
+   | Kaunitzer Teller (roh) | 4 Dönerfleisch, 3 Käse, 4 Karotten (die Pommes), 1 Jotunn-Pilz, 1 Berg-Gewürz |
+   | Spexarder Pizza (roh) | 3 Brotteig, 6 Dönerfleisch, 4 Käse, 2 Zwiebeln, 1 Magecap-Pilz, 1 Berg-Gewürz |
 
 3. **Backen** im Steinofen (Stone Oven), 60 Sekunden. Heraus kommt das fertige Gericht.
 4. Mit dem **Servierteller** auf den Tisch stellen und gemeinsam essen.
