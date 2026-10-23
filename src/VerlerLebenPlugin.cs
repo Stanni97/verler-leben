@@ -20,7 +20,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.1.0";
+        public const string PluginVersion = "1.1.1";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -30,13 +30,13 @@ namespace VerlerLeben
             new Ingredient
             {
                 Key = "Doener", PrefabName = "DF_Doener", BasePrefab = "LoxMeat",
-                // Lox (Plains), wolf (Mountains) and the Mistlands spice.
-                Ingredients = "CookedLoxMeat:2,CookedWolfMeat:2,SpiceMistlands:1", Amount = 3,
+                // A little lox (Plains), wolf (Mountains) and the Mountains spice.
+                Ingredients = "CookedLoxMeat:1,CookedWolfMeat:2,SpiceMountains:1", Amount = 3,
             },
             new Ingredient
             {
                 Key = "Kaese", PrefabName = "DF_Kaese", BasePrefab = "BreadDough",
-                Ingredients = "LoxMeat:1", Amount = 2,
+                Ingredients = "ChickenEgg:2", Amount = 3,
             },
         };
 
@@ -47,7 +47,7 @@ namespace VerlerLeben
             {
                 Key = "Teller", RawPrefab = "DF_TellerRaw", MaterialPrefab = "DF_Teller_Material", FeastPrefab = "DF_FeastTeller",
                 BaseMaterial = "FeastMeadows_Material", BaseFeast = "FeastMeadows",
-                Ingredients = "DF_Doener:6,DF_Kaese:4,Carrot:5,Onion:3,MushroomJotunPuffs:2",
+                Ingredients = "DF_Doener:6,DF_Kaese:4,Carrot:5,Onion:3,MushroomJotunPuffs:2,SpiceMountains:1",
                 Health = 100f, Stamina = 50f, Regen = 7f, BurnSeconds = 3600f,
             },
             // Balanced and very filling: a big pizza with plenty of Döner meat.
@@ -55,7 +55,7 @@ namespace VerlerLeben
             {
                 Key = "Pizza", RawPrefab = "DF_PizzaRaw", MaterialPrefab = "DF_Pizza_Material", FeastPrefab = "DF_FeastPizza",
                 BaseMaterial = "FeastBlackforest_Material", BaseFeast = "FeastBlackforest",
-                Ingredients = "BreadDough:4,DF_Doener:8,DF_Kaese:6,Cloudberry:4,MushroomMagecap:2,Onion:2",
+                Ingredients = "BreadDough:4,DF_Doener:8,DF_Kaese:6,Cloudberry:4,MushroomMagecap:2,Onion:2,SpiceMountains:1",
                 Health = 80f, Stamina = 80f, Regen = 6f, BurnSeconds = 4800f,
             },
         };
@@ -86,9 +86,9 @@ namespace VerlerLeben
             loc.AddTranslation("English", new Dictionary<string, string>
             {
                 { "item_df_doener", "Döner Meat" },
-                { "item_df_doener_desc", "Thin slices of lox and wolf meat from the spit, seasoned with the spice of the Mistlands. The base of every good feast." },
+                { "item_df_doener_desc", "Thin slices of wolf and a little lox meat from the spit, seasoned with the spice of the mountains. The base of every good feast." },
                 { "item_df_kaese", "Cheese" },
-                { "item_df_kaese_desc", "Melts beautifully. Made from lox milk, don't ask." },
+                { "item_df_kaese_desc", "Melts beautifully. Made from eggs, don't ask." },
 
                 { "item_df_teller_raw", "Kaunitzer Plate (raw)" },
                 { "item_df_teller_raw_desc", "Döner and fries in an aluminium tray, covered in cheese. Needs to be baked in the stone oven." },
@@ -104,9 +104,9 @@ namespace VerlerLeben
             loc.AddTranslation("German", new Dictionary<string, string>
             {
                 { "item_df_doener", "Dönerfleisch" },
-                { "item_df_doener_desc", "Dünne Scheiben Lox- und Wolfsfleisch vom Spieß, gewürzt mit dem Gewürz der Nebelwelt. Die Grundlage jedes guten Festmahls." },
+                { "item_df_doener_desc", "Dünne Scheiben Wolfsfleisch und ein wenig Loxfleisch vom Spieß, gewürzt mit dem Gewürz der Berge. Die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
-                { "item_df_kaese_desc", "Schmilzt wunderbar. Aus Loxmilch gemacht, frag nicht." },
+                { "item_df_kaese_desc", "Schmilzt wunderbar. Aus Eiern gemacht, frag nicht." },
 
                 { "item_df_teller_raw", "Kaunitzer Teller (roh)" },
                 { "item_df_teller_raw_desc", "Döner und Pommes in der Aluschale, dick mit Käse bedeckt. Muss im Steinofen gebacken werden." },

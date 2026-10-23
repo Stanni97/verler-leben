@@ -24,21 +24,21 @@ Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minute
 
 ## Herstellung
 
-Die Zutaten kommen aus den Ebenen (Lox, Brotteig, Wolkenbeeren), den Bergen (Wolf, Zwiebeln) und der Nebelwelt (Gewürz, Pilze). Zuerst die Zutaten, dann das rohe Gericht, dann ab in den Ofen.
+Die Zutaten kommen aus den Ebenen (Lox, Brotteig, Wolkenbeeren), den Bergen (Wolf, Zwiebeln, Gewürz) und der Nebelwelt (Pilze). Zuerst die Zutaten, dann das rohe Gericht, dann ab in den Ofen.
 
 1. **Zutaten** am Essenszubereitungstisch (Food Preparation Table) herstellen:
 
    | Zutat | Rezept | Ergibt |
    | --- | --- | --- |
-   | Dönerfleisch | 2 gebratenes Loxfleisch, 2 gebratenes Wolfsfleisch, 1 Nebelwelt-Gewürz | 3 |
-   | Käse | 1 Loxfleisch (aus Loxmilch, frag nicht) | 2 |
+   | Dönerfleisch | 1 gebratenes Loxfleisch, 2 gebratenes Wolfsfleisch, 1 Berg-Gewürz | 3 |
+   | Käse | 2 Eier (frag nicht) | 3 |
 
 2. **Rohes Gericht** am Essenszubereitungstisch herstellen:
 
    | Gericht | Rezept |
    | --- | --- |
-   | Kaunitzer Teller (roh) | 6 Dönerfleisch, 4 Käse, 5 Karotten (die Pommes), 3 Zwiebeln, 2 Jotunn-Pilze |
-   | Spexarder Pizza (roh) | 4 Brotteig, 8 Dönerfleisch, 6 Käse, 4 Wolkenbeeren (die Soße), 2 Magecap-Pilze, 2 Zwiebeln |
+   | Kaunitzer Teller (roh) | 6 Dönerfleisch, 4 Käse, 5 Karotten (die Pommes), 3 Zwiebeln, 2 Jotunn-Pilze, 1 Berg-Gewürz |
+   | Spexarder Pizza (roh) | 4 Brotteig, 8 Dönerfleisch, 6 Käse, 4 Wolkenbeeren (die Soße), 2 Magecap-Pilze, 2 Zwiebeln, 1 Berg-Gewürz |
 
 3. **Backen** im Steinofen (Stone Oven), 60 Sekunden. Heraus kommt das fertige Gericht.
 4. Mit dem **Servierteller** auf den Tisch stellen und gemeinsam essen.

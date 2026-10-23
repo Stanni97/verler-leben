@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+- Dönerfleisch braucht ein Fleisch weniger und weniger Lox: 1 gebratenes Loxfleisch, 2 gebratenes Wolfsfleisch und Berg-Gewürz statt Nebelwelt-Gewürz (ergibt 3).
+- Käse wird aus 2 Eiern statt aus Loxfleisch gemacht (ergibt 3).
+- Teller und Pizza brauchen zusätzlich 1 Berg-Gewürz.
+- Bestehende Configs behalten ihre alten Werte. Zum Übernehmen `BepInEx/config/felix.verlerleben.cfg` löschen.
+
 ## 1.1.0
 
 - Stärkere Feasts: Kaunitzer Teller 100 Leben / 50 Ausdauer (60 Min.), Spexarder Pizza 80 / 80 (80 Min.).
