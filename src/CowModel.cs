@@ -128,6 +128,13 @@ namespace VerlerLeben
                 material.SetColor("_EmissionColor", Color.black);   // the Lox eye glows, a cow's does not
             }
 
+            if (material.HasProperty("_EmissionMap"))
+            {
+                material.SetTexture("_EmissionMap", Texture2D.blackTexture);
+            }
+
+            material.DisableKeyword("_EMISSION");
+
             if (material.HasProperty("_Glossiness"))
             {
                 material.SetFloat("_Glossiness", 0f);   // matt coat
