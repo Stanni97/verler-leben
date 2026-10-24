@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2
+
+- Die Kühe leben jetzt in den **Ebenen** statt in den Wiesen, dort wachsen auch Gerste und Flachs, ihr Futter. In der Config unter `[Cow]` stellt `SpawnBiome` das Biom ein (Plains, Meadows, BlackForest, Swamp, Mountain, Mistlands). Schon vorhandene Kühe in den Wiesen bleiben, wo sie sind.
+- Behoben: Beim Töten verwandelte sich die Kuh in einen Lox, weil die Todesanimation noch den Lox-Körper benutzte. Kuh und Kalb haben jetzt eigene Ragdolls mit dem Kuhmodell und demselben Fell.
+
 ## 1.2.1
 
 - Dönerfleisch wird aus 1 Rindfleisch, 1 gebratenem Loxfleisch und 1 Berg-Gewürz gemacht (statt 2 gebratenem Wolfsfleisch).

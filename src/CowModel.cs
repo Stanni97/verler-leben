@@ -26,11 +26,11 @@ namespace VerlerLeben
             ("VerlerLeben.cow_braun.png", 2),
         };
 
-        private static Mesh _mesh;
+        private static readonly Dictionary<string, Mesh> Meshes = new Dictionary<string, Mesh>();
         internal static Material[] CoatMaterials;
 
         /// <summary>Returns false if the prefab has no Lox body to replace or the data is missing.</summary>
-        public static bool Apply(GameObject prefab)
+        public static bool Apply(GameObject prefab, bool ragdoll = false)
         {
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             {
@@ -43,10 +43,8 @@ namespace VerlerLeben
                 return false;
             }
 
-            if (_mesh == null)
+            if (CoatMaterials == null)
             {
-                _mesh = LoadMesh(body.bones);
-                _mesh.bindposes = body.sharedMesh.bindposes;
                 CoatMaterials = new Material[Coats.Length];
                 for (int i = 0; i < Coats.Length; i++)
                 {
@@ -54,11 +52,20 @@ namespace VerlerLeben
                 }
             }
 
-            body.sharedMesh = _mesh;
-            body.sharedMaterials = new[] { CoatMaterials[0] };
-            if (prefab.GetComponent<CowLegs>() == null)
+            // One mesh per bone order, the Lox, its calf and the ragdolls all have the same 31 bones.
+            string order = string.Join(",", Array.ConvertAll(body.bones, b => b == null ? "" : b.name));
+            if (!Meshes.TryGetValue(order, out Mesh mesh))
             {
-                prefab.AddComponent<CowLegs>();
+                mesh = LoadMesh(body.bones);
+                mesh.bindposes = body.sharedMesh.bindposes;
+                Meshes[order] = mesh;
+            }
+
+            body.sharedMesh = mesh;
+            body.sharedMaterials = new[] { CoatMaterials[0] };
+            if (!ragdoll && prefab.GetComponent<CowLegs>() == null)
+            {
+                prefab.AddComponent<CowLegs>();   // a ragdoll falls by physics, its legs must not be pulled straight
             }
 
             if (prefab.GetComponent<CowCoat>() == null)
@@ -250,10 +257,20 @@ namespace VerlerLeben
         }
     }
 
-    /// <summary>Gives every cow and calf its coat, chosen by its network id so all players see the same.</summary>
+    /// <summary>
+    /// Gives every cow and calf its coat, chosen by its network id so all players see the same. A ragdoll takes the
+    /// coat of the cow it came from (see RagdollCoat).
+    /// </summary>
     internal class CowCoat : MonoBehaviour
     {
+        internal const string CoatKey = "DF_coat";
+
         private void Start()
+        {
+            Apply();
+        }
+
+        internal void Apply()
         {
             var nview = GetComponent<ZNetView>();
             SkinnedMeshRenderer body = CowModel.FindBody(gameObject);
@@ -262,7 +279,39 @@ namespace VerlerLeben
                 return;
             }
 
-            body.sharedMaterial = CowModel.CoatMaterials[CowModel.CoatFor(nview.GetZDO().m_uid.ID)];
+            int coat = nview.GetZDO().GetInt(CoatKey, -1);
+            if (coat < 0 || coat >= CowModel.CoatMaterials.Length)
+            {
+                coat = CowModel.CoatFor(nview.GetZDO().m_uid.ID);
+            }
+
+            body.sharedMaterial = CowModel.CoatMaterials[coat];
+        }
+    }
+
+    /// <summary>When a cow dies, its ragdoll gets the same coat: the coat is written into the ragdoll's data.</summary>
+    [HarmonyLib.HarmonyPatch(typeof(Ragdoll), nameof(Ragdoll.Setup))]
+    internal static class RagdollCoat
+    {
+        [HarmonyLib.HarmonyPostfix]
+        private static void Postfix(Ragdoll __instance, CharacterDrop characterDrop)
+        {
+            var coat = __instance.GetComponent<CowCoat>();
+            var ragdollView = __instance.GetComponent<ZNetView>();
+            ZNetView cowView = characterDrop != null ? characterDrop.GetComponent<ZNetView>() : null;
+            if (coat == null || ragdollView == null || !ragdollView.IsValid() || cowView == null || !cowView.IsValid())
+            {
+                return;
+            }
+
+            int index = cowView.GetZDO().GetInt(CowCoat.CoatKey, -1);
+            if (index < 0)
+            {
+                index = CowModel.CoatFor(cowView.GetZDO().m_uid.ID);
+            }
+
+            ragdollView.GetZDO().Set(CowCoat.CoatKey, index);
+            coat.Apply();
         }
     }
 }

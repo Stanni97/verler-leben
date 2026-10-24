@@ -58,8 +58,8 @@ namespace VerlerLeben
                 {
                     new SpawnConfig
                     {
-                        Name = "DF_Kuh_Meadows",
-                        Biome = Heightmap.Biome.Meadows,
+                        Name = "DF_Kuh_Spawn",
+                        Biome = settings.SpawnBiome,
                         MaxSpawned = Mathf.Max(1, settings.SpawnMax),
                         SpawnInterval = 30f,
                         SpawnChance = Mathf.Clamp(settings.SpawnChance, 1f, 100f),
@@ -89,6 +89,12 @@ namespace VerlerLeben
                     ApplyCowPattern(calf.Prefab, 17);
                     ApplyCowPattern(cow.Prefab, 17);
                 }
+                else
+                {
+                    // On death the game puts a ragdoll in place of the creature. Without our own, a Lox would fall over.
+                    ReplaceRagdoll(cow.Prefab, "lox_ragdoll", CowPrefab + "_ragdoll", settings.Scale, log);
+                    ReplaceRagdoll(calf.Prefab, "loxcalf_ragdoll", CalfPrefab + "_ragdoll", settings.Scale * 0.75f, log);
+                }
             }
             catch (Exception e)
             {
@@ -98,6 +104,35 @@ namespace VerlerLeben
             CreatureManager.Instance.AddCreature(calf);
             CreatureManager.Instance.AddCreature(cow);
             log.LogInfo("Added " + CowPrefab + " and " + CalfPrefab + ".");
+        }
+
+        /// <summary>A copy of the Lox ragdoll with the cow model, in the death effects of the cow instead of the original.</summary>
+        private static void ReplaceRagdoll(GameObject creature, string originalName, string name, float scale, ManualLogSource log)
+        {
+            GameObject original = PrefabManager.Instance.GetPrefab(originalName);
+            var character = creature.GetComponent<Character>();
+            if (original == null || character == null)
+            {
+                log.LogWarning("Ragdoll " + originalName + " not found, the " + creature.name + " falls over as a Lox.");
+                return;
+            }
+
+            GameObject ragdoll = PrefabManager.Instance.CreateClonedPrefab(name, original);
+            if (ragdoll == null || !CowModel.Apply(ragdoll, ragdoll: true))
+            {
+                log.LogWarning("Could not build the ragdoll " + name + ".");
+                return;
+            }
+
+            ragdoll.transform.localScale = Vector3.one * scale;
+            PrefabManager.Instance.AddPrefab(ragdoll);
+            foreach (EffectList.EffectData effect in character.m_deathEffects.m_effectPrefabs)
+            {
+                if (effect.m_prefab != null && effect.m_prefab.name == originalName)
+                {
+                    effect.m_prefab = ragdoll;
+                }
+            }
         }
 
         private static void ConfigureCow(GameObject cow, GameObject calf, CowSettings settings)
@@ -279,6 +314,7 @@ namespace VerlerLeben
     internal sealed class CowSettings
     {
         public bool Enabled = true;
+        public Heightmap.Biome SpawnBiome = Heightmap.Biome.Plains;
         public int SpawnMax = 3;
         public float SpawnChance = 50f;
         public int GroupMin = 2;
@@ -296,7 +332,9 @@ namespace VerlerLeben
         {
             const string s = "Cow";
             Enabled = config.Bind(s, "Enabled", Enabled, "Adds the cow, her calf, milk and beef to the game.").Value;
-            SpawnMax = config.Bind(s, "SpawnMax", SpawnMax, "How many cows spawn around you in the Meadows at most.").Value;
+            SpawnBiome = config.Bind(s, "SpawnBiome", SpawnBiome,
+                "Where the cows live. Plains is where Barley and Flax, their food, grow. Meadows, BlackForest, Swamp, Mountain or Mistlands work too.").Value;
+            SpawnMax = config.Bind(s, "SpawnMax", SpawnMax, "How many cows spawn around you in that biome at most.").Value;
             SpawnChance = config.Bind(s, "SpawnChancePercent", SpawnChance, "Chance per spawn attempt, in percent.").Value;
             GroupMin = config.Bind(s, "GroupMin", GroupMin, "Smallest herd.").Value;
             GroupMax = config.Bind(s, "GroupMax", GroupMax, "Largest herd.").Value;

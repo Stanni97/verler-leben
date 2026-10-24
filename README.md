@@ -24,7 +24,7 @@ Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minute
 
 ## Die Kuh
 
-In den **Wiesen** laufen jetzt Kühe herum, schwarzbunt, rotbunt oder braun. Sie bewegen sich mit den Animationen des Lox, sehen aber aus wie Kühe. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
+In den **Ebenen** laufen jetzt Kühe herum, dort wachsen auch Gerste und Flachs, ihr Futter, schwarzbunt, rotbunt oder braun. Sie bewegen sich mit den Animationen des Lox, sehen aber aus wie Kühe. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
 
 - **Zähmen:** Wirf Gerste oder Flachs in ihre Nähe und halte Abstand. Nach etwa 5 Minuten ist sie zahm (ein Lox braucht 30).
 - **Melken:** Eine zahme, satte Kuh streichelst du mit **E**. Statt „Streicheln“ steht dort „Melken“. Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch.
@@ -145,7 +145,7 @@ Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `Craftin
 
 Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
 
-Der Abschnitt `[Cow]` schaltet die Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
+Der Abschnitt `[Cow]` schaltet die Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnBiome`, `SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
 
 Die Prefab-Namen der Vanilla-Zutaten stehen in der [Jotunn-Itemliste](https://valheim-modding.github.io/Jotunn/data/objects/item-list.html).
 
