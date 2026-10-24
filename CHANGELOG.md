@@ -3,6 +3,7 @@
 ## 1.2.2
 
 - Die Kühe leben jetzt in den **Ebenen** statt in den Wiesen, dort wachsen auch Gerste und Flachs, ihr Futter. In der Config unter `[Cow]` stellt `SpawnBiome` das Biom ein (Plains, Meadows, BlackForest, Swamp, Mountain, Mistlands). Schon vorhandene Kühe in den Wiesen bleiben, wo sie sind.
+- Zahme Kühe folgen dir jetzt: **E** wechselt zwischen Folgen und Warten, wie beim Wolf. Dafür ist das **Melken** auf eine eigene Taste gewandert, standardmäßig **H** (Config: `MilkKey` unter `[Cow]`). Der Hovertext zeigt beide Tasten.
 - Behoben: Beim Töten verwandelte sich die Kuh in einen Lox, weil die Todesanimation noch den Lox-Körper benutzte. Kuh und Kalb haben jetzt eigene Ragdolls mit dem Kuhmodell und demselben Fell.
 
 ## 1.2.1

@@ -155,7 +155,7 @@ namespace VerlerLeben
             var tameable = cow.GetComponent<Tameable>();
             tameable.m_tamingTime = settings.TamingSeconds;
             tameable.m_fedDuration = settings.FedSeconds;
-            tameable.m_commandable = false;
+            tameable.m_commandable = true;   // E makes her follow or wait, like a wolf; milking has its own key
 
             var procreation = cow.GetComponent<Procreation>();
             procreation.m_offspring = calf;
@@ -325,6 +325,7 @@ namespace VerlerLeben
         public float FedSeconds = 900f;
         public float GrowSeconds = 1200f;
         public float MilkCooldownSeconds = 1800f;
+        public KeyCode MilkKey = KeyCode.H;
         public int MilkMin = 1;
         public int MilkMax = 2;
 
@@ -344,33 +345,51 @@ namespace VerlerLeben
             FedSeconds = config.Bind(s, "FedSeconds", FedSeconds, "How long a meal of Barley or Flax keeps a cow fed.").Value;
             GrowSeconds = config.Bind(s, "CalfGrowSeconds", GrowSeconds, "How long a calf needs to grow up.").Value;
             MilkCooldownSeconds = config.Bind(s, "MilkCooldownSeconds", MilkCooldownSeconds, "Time between two milkings of the same cow (one game day is 1800 s).").Value;
+            MilkKey = config.Bind(s, "MilkKey", MilkKey,
+                "Key to milk the cow you look at. E makes her follow you or wait, like a wolf. Not used by the game: H, Y, U, J, N.").Value;
             MilkMin = config.Bind(s, "MilkMin", MilkMin, "Least milk per milking.").Value;
             MilkMax = config.Bind(s, "MilkMax", MilkMax, "Most milk per milking.").Value;
         }
     }
 
-    /// <summary>Milking: petting a tame, fed cow gives milk, once per cooldown.</summary>
-    [HarmonyPatch(typeof(Tameable), nameof(Tameable.Interact))]
-    internal static class MilkInteract
+    /// <summary>Milking a tame, fed cow with the milk key gives milk, once per cooldown.</summary>
+    internal static class Milking
     {
         private const string LastMilkKey = "DF_lastMilk";
 
-        [HarmonyPostfix]
-        private static void Postfix(Tameable __instance, Humanoid user, bool hold, bool alt, bool __result)
+        private static readonly AccessTools.FieldRef<Player, GameObject> Hovering =
+            AccessTools.FieldRefAccess<Player, GameObject>("m_hovering");
+
+        private static readonly System.Reflection.MethodInfo TakeInput = AccessTools.Method(typeof(Player), "TakeInput");
+
+        /// <summary>The tame cow the player looks at, or null.</summary>
+        internal static Tameable HoveredCow(Player player)
         {
-            if (!__result || hold || alt || Cows.Settings == null || __instance.GetComponent<DfCow>() == null)
+            GameObject hovering = Hovering(player);
+            Tameable tameable = hovering != null ? hovering.GetComponentInParent<Tameable>() : null;
+            if (tameable == null || tameable.GetComponent<DfCow>() == null)
+            {
+                return null;
+            }
+
+            var character = tameable.GetComponent<Character>();
+            return character != null && character.IsTamed() ? tameable : null;
+        }
+
+        internal static bool InputAllowed(Player player)
+        {
+            return TakeInput == null || (bool)TakeInput.Invoke(player, null);
+        }
+
+        internal static void TryMilk(Tameable cow, Humanoid user)
+        {
+            var nview = cow.GetComponent<ZNetView>();
+            if (nview == null || !nview.IsValid())
             {
                 return;
             }
 
-            var nview = __instance.GetComponent<ZNetView>();
-            var character = __instance.GetComponent<Character>();
-            if (nview == null || !nview.IsValid() || character == null || !character.IsTamed())
-            {
-                return;
-            }
-
-            if (__instance.IsHungry())
+            if (cow.IsHungry())
             {
                 user.Message(MessageHud.MessageType.Center, "$df_cow_hungry");
                 return;
@@ -428,7 +447,28 @@ namespace VerlerLeben
         }
     }
 
-    /// <summary>Hover text of a tame cow: "Milk" instead of "Pet", and whether she can be milked.</summary>
+    /// <summary>Pressing the milk key while looking at a tame cow milks her.</summary>
+    [HarmonyPatch(typeof(Player), "Update")]
+    internal static class MilkKeyPress
+    {
+        [HarmonyPostfix]
+        private static void Postfix(Player __instance)
+        {
+            if (__instance != Player.m_localPlayer || Cows.Settings == null || !ZInput.GetKeyDown(Cows.Settings.MilkKey)
+                || !Milking.InputAllowed(__instance))
+            {
+                return;
+            }
+
+            Tameable cow = Milking.HoveredCow(__instance);
+            if (cow != null)
+            {
+                Milking.TryMilk(cow, __instance);
+            }
+        }
+    }
+
+    /// <summary>Hover text of a tame cow: E follows or waits, the milk key milks, and whether she can be milked.</summary>
     [HarmonyPatch(typeof(Tameable), nameof(Tameable.GetHoverText))]
     internal static class MilkHover
     {
@@ -448,9 +488,9 @@ namespace VerlerLeben
             }
 
             Localization loc = Localization.instance;
-            __result = __result.Replace(loc.Localize("$hud_pet"), loc.Localize("$df_milk_action"));
-            string status = MilkInteract.MilkReady(nview) ? "$df_cow_ready" : "$df_cow_done_short";
-            __result += loc.Localize("\n<color=#bbbbbb>" + status + "</color>");
+            __result = __result.Replace(loc.Localize("$hud_pet"), loc.Localize("$df_cow_follow"));
+            string status = Milking.MilkReady(nview) ? "$df_cow_ready" : "$df_cow_done_short";
+            __result += loc.Localize("\n[<color=yellow><b>" + Cows.Settings.MilkKey + "</b></color>] $df_milk_action <color=#bbbbbb>(" + status + ")</color>");
         }
     }
 }
