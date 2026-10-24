@@ -320,41 +320,66 @@ def draw_boonekamp():
     return shade(layer, 0.2)
 
 
+def rot_rect(d, cx, cy, w, h, ang, fill, outline=None):
+    """Filled rectangle turned by ang (radians) around its centre."""
+    c, sn = math.cos(ang), math.sin(ang)
+    pts = [(cx + x * c - y * sn, cy + x * sn + y * c) for x, y in ((-w / 2, -h / 2), (w / 2, -h / 2), (w / 2, h / 2), (-w / 2, h / 2))]
+    d.polygon(pts, fill=fill, outline=outline)
+    return pts
+
+
 def draw_manta(baked):
-    """Mantaplatte: Currywurst slices and fries with a swirl of mayo on a white plate."""
+    """Mantaplatte like the photo: an oval white dish, thick golden fries piled at the back with a dollop of mayo,
+    glossy currywurst chunks in orange-red sauce in front. Raw: pale fries, pink sausage, no sauce, no mayo."""
     rng = random.Random(71 if baked else 72)
-    cx, cy, rx, ry = 256, 262, 214, 170
     layer = new_layer()
     d = ImageDraw.Draw(layer)
+
+    # the dish: oval, raised rim, a darker well inside
+    d.ellipse([36, 196, 484, 452], fill=(210, 214, 222, 255))
+    d.ellipse([46, 202, 474, 440], fill=(244, 245, 248, 255))
+    d.ellipse([70, 220, 450, 424], fill=(226, 229, 236, 255))
+    d.ellipse([84, 226, 436, 412], fill=(238, 240, 245, 255))
+
+    fry = (246, 206, 88) if baked else (240, 226, 178)
+    fry_edge = (252, 232, 150) if baked else (248, 240, 208)
+    fry_dark = (214, 150, 44) if baked else (222, 202, 150)
+    chips = []
+    for _ in range(26):                                   # thick chips, piled up to the back right
+        x = rng.uniform(230, 420)
+        y = rng.uniform(120, 290) + (x - 230) * -0.1
+        chips.append((y, x, rng.uniform(-0.9, 0.5)))
+    for y, x, a in sorted(chips):
+        w, h = rng.uniform(70, 96), rng.uniform(26, 32)
+        rot_rect(d, x, y + 4, w, h, a, fry_dark + (255,))
+        rot_rect(d, x, y, w, h, a, fry + (255,))
+        rot_rect(d, x - 2, y - 3, w - 8, h * 0.45, a, fry_edge + (255,))
+
+    meat = (166, 82, 46) if baked else (212, 132, 120)
+    inner = (206, 118, 74) if baked else (232, 168, 156)
+    sauce = (226, 86, 30) if baked else None
     if baked:
-        d.ellipse([cx - rx - 26, cy - ry - 18, cx + rx + 26, cy + ry + 26], fill=(226, 228, 232, 255))
-        d.ellipse([cx - rx - 12, cy - ry - 8, cx + rx + 12, cy + ry + 14], fill=(246, 247, 249, 255))
-    else:
-        d.ellipse([cx - rx + 10, cy - ry + 10, cx + rx - 10, cy + ry - 10], fill=(238, 240, 244, 255))
-    fry = (240, 196, 72) if baked else (238, 222, 170)
-    for _ in range(26):                                              # fries on the left
-        x, y = rng.uniform(110, 270), rng.uniform(170, 350)
-        a = rng.uniform(-0.9, 0.9)
-        dx, dy = math.cos(a) * 52, math.sin(a) * 52
-        d.line([x - dx, y - dy, x + dx, y + dy], fill=lerp(fry, (150, 96, 30), rng.uniform(0, 0.35)) + (255,), width=17)
-    meat = (150, 74, 44) if baked else (206, 130, 118)
-    for i in range(6):                                               # sausage slices on the right
-        x, y = 300 + (i % 3) * 52 + rng.uniform(-6, 6), 190 + (i // 3) * 82 + rng.uniform(-6, 6)
-        d.ellipse([x - 32, y - 28, x + 32, y + 28], fill=lerp(meat, (50, 20, 10), 0.35) + (255,))
-        d.ellipse([x - 28, y - 25, x + 28, y + 23], fill=meat + (255,))
-        d.ellipse([x - 12, y - 10, x + 12, y + 8], fill=lerp(meat, (255, 220, 200), 0.3) + (255,))
+        for _ in range(5):                                # sauce pooling around the sausage
+            blob(d, rng.uniform(100, 250), rng.uniform(320, 380), rng.uniform(34, 56), rng.uniform(14, 22), (204, 66, 26, 255), rng, jitter=0.3)
+    pieces = [(130, 330, -0.5), (200, 300, -0.2), (270, 336, -0.35), (110, 270, 0.2), (180, 360, -0.1), (250, 280, 0.3)]
+    for x, y, a in pieces:
+        # chunk of sausage, cut at an angle: body, cut face, glossy sauce coat
+        blob(d, x, y + 10, 52, 28, lerp(meat, (40, 14, 8), 0.4) + (255,), rng, jitter=0.1, rot=a)
+        blob(d, x, y, 52, 30, meat + (255,), rng, jitter=0.1, rot=a)
+        blob(d, x + 6, y - 6, 34, 18, inner + (255,), rng, jitter=0.12, rot=a + 0.2)
+        if baked:
+            blob(d, x - 4, y + 2, 46, 24, sauce + (200,), rng, jitter=0.18, rot=a)
+            blob(d, x + 8, y - 8, 22, 9, (240, 130, 60, 200), rng, jitter=0.2, rot=a)
+            blob(d, x - 12, y - 10, 9, 4, (255, 236, 210, 230), rng, jitter=0.2, rot=a)   # shine
     if baked:
-        for _ in range(7):                                           # curry ketchup over the sausage
-            x, y = rng.uniform(290, 430), rng.uniform(180, 340)
-            blob(d, x, y, rng.uniform(16, 28), rng.uniform(10, 18), (196, 56, 28, 255), rng, jitter=0.35)
-        for _ in range(60):                                          # curry powder
-            x, y = rng.uniform(290, 440), rng.uniform(180, 350)
+        for _ in range(40):                               # curry powder
+            x, y = rng.uniform(90, 300), rng.uniform(250, 380)
             d.ellipse([x - 3, y - 2, x + 3, y + 2], fill=(236, 178, 44, 255))
-    mayo = (252, 248, 238, 255)
-    for k in range(3):                                               # mayo swirl on the fries
-        blob(d, 232 + k * 6, 262 - k * 3, 62 - k * 14, 30 - k * 7, mayo, rng, jitter=0.12, rot=0.2)
-    d.ellipse([228, 246, 256, 262], fill=(244, 238, 222, 255))
-    return shade(layer, 0.25)
+        # mayo: white dollop with a peak on top of the chips
+        for k, (rx, ry) in enumerate(((58, 30), (46, 28), (32, 24), (18, 18))):
+            blob(d, 330, 188 - k * 14, rx, ry, lerp((250, 248, 242), (226, 226, 232), k * 0.12) + (255,), rng, jitter=0.1, rot=0.0)
+        d.ellipse([316, 142, 332, 154], fill=(255, 255, 255, 255))
+    return shade(layer, 0.22)
 
 
 def draw_entenbox():
