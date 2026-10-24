@@ -328,71 +328,177 @@ def rot_rect(d, cx, cy, w, h, ang, fill, outline=None):
     return pts
 
 
-def wavy_ellipse(d, cx, cy, rx, ry, fill, waves=18, depth=0.03, outline=None):
-    """Ellipse with a scalloped edge, like a paper chip tray."""
-    pts = []
-    for i in range(180):
-        a = i / 180 * math.tau
-        k = 1 + depth * math.sin(a * waves)
-        pts.append((cx + math.cos(a) * rx * k, cy + math.sin(a) * ry * k))
-    d.polygon(pts, fill=fill, outline=outline)
+def convex_hull(points):
+    pts = sorted(set(points))
+    if len(pts) < 3:
+        return pts
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+    lower, upper = [], []
+    for p in pts:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+            lower.pop()
+        lower.append(p)
+    for p in reversed(pts):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+            upper.pop()
+        upper.append(p)
+    return lower[:-1] + upper[:-1]
+
+
+def with_shadow(base, part, offset=(6, 10), blur=7, alpha=110):
+    """Composites part onto base with a soft drop shadow underneath."""
+    mask = part.getchannel("A").point(lambda v: alpha if v > 0 else 0)
+    shadow = Image.new("RGBA", (W, H), (30, 16, 6, 0))
+    shadow.putalpha(mask)
+    shadow = shadow.filter(ImageFilter.GaussianBlur(blur))
+    moved = new_layer()
+    moved.alpha_composite(shadow, offset)
+    base.alpha_composite(moved)
+    base.alpha_composite(part)
+
+
+def gloss(layer, spots, blur=4):
+    """Soft white highlights (x, y, rx, ry, alpha) on top of a layer, clipped to it."""
+    g = Image.new("RGBA", (W, H), (255, 252, 244, 0))   # colour everywhere, so blurring only softens the alpha
+    gd = ImageDraw.Draw(g)
+    for x, y, rx, ry, a in spots:
+        gd.ellipse([x - rx, y - ry, x + rx, y + ry], fill=(255, 252, 244, a))
+    g = g.filter(ImageFilter.GaussianBlur(blur))
+    g.putalpha(ImageChops.multiply(g.getchannel("A"), layer.getchannel("A")))   # clip without darkening the edges
+    layer.alpha_composite(g)
+
+
+def draw_fry(d, rng, cx, cy, length, angle, width, raw):
+    """A thick, square-cut chip in a slight top view: darker side face, golden top with a light ridge,
+    flat cut ends with a slightly browner rim, a few fried specks."""
+    top = (250, 216, 98) if not raw else (242, 232, 190)
+    ridge = (255, 236, 156) if not raw else (250, 244, 218)
+    side = (222, 168, 62) if not raw else (226, 210, 164)
+    end = (236, 186, 74) if not raw else (234, 222, 178)
+    top = lerp(top, (246, 200, 70) if not raw else top, rng.uniform(0, 0.5))
+    c, s = math.cos(angle), math.sin(angle)
+    hx, hy = c * length / 2, s * length / 2
+    px, py = -s * width / 2, c * width / 2
+    corners = [(cx - hx - px, cy - hy - py), (cx + hx - px, cy + hy - py), (cx + hx + px, cy + hy + py), (cx - hx + px, cy - hy + py)]
+    thick = width * 0.5
+    lowered = [(x, y + thick) for x, y in corners]
+    d.polygon(convex_hull(corners + lowered), fill=side + (255,))
+    # the cut ends, a bit lighter than the side
+    for i, j in ((0, 3), (1, 2)):
+        d.polygon([corners[i], corners[j], lowered[j], lowered[i]], fill=end + (255,))
+    d.polygon(corners, fill=top + (255,))
+    q = 0.32
+    d.polygon([(cx - hx * 0.96 - px, cy - hy * 0.96 - py), (cx + hx * 0.96 - px, cy + hy * 0.96 - py),
+               (cx + hx * 0.96 - px * (1 - 2 * q), cy + hy * 0.96 - py * (1 - 2 * q)),
+               (cx - hx * 0.96 - px * (1 - 2 * q), cy - hy * 0.96 - py * (1 - 2 * q))], fill=ridge + (255,))
+    # slightly browner where it was cut
+    for sign in (-1, 1):
+        ex, ey = cx + sign * hx * 0.93, cy + sign * hy * 0.93
+        d.line([ex - px, ey - py, ex + px, ey + py], fill=lerp(top, (200, 130, 40), 0.35) + (255,), width=4)
+    for _ in range(int(length / 14)):
+        t, u = rng.uniform(-0.42, 0.42), rng.uniform(-0.35, 0.35)
+        x, y = cx + c * length * t - s * width * u, cy + s * length * t + c * width * u
+        col = lerp(top, (200, 140, 40), 0.3) if not raw else lerp(top, (214, 196, 150), 0.3)
+        d.ellipse([x - 1.6, y - 1.2, x + 1.8, y + 1.6], fill=col + (255,))
 
 
 def draw_manta(baked):
-    """Mantaplatte as served at the snack bar: a paper chip tray with a scalloped rim, a pile of thick chips with a big
-    blob of mayo on the left, Currywurst chunks in dark red sauce with lots of curry powder on the right and a wooden
-    pick in it. Raw: pale chips, pink sausage, no sauce, no mayo."""
-    rng = random.Random(81 if baked else 82)
-    layer = new_layer()
-    d = ImageDraw.Draw(layer)
+    """Mantaplatte like at the snack bar (after a photo): a white paper chip tray with a pleated rim, a big pile of
+    thick chips on the left with a large dollop of mayo, Currywurst chunks drowned in dark, glossy curry ketchup with
+    heaps of curry powder on the right.
+    Raw: pale chips and pink sausage, no sauce, no mayo."""
+    rng = random.Random(91 if baked else 92)
+    raw = not baked
+    out = new_layer()
 
-    # paper tray: shadow side, rim and the well
-    wavy_ellipse(d, 256, 318, 232, 150, (196, 176, 140, 255))
-    wavy_ellipse(d, 256, 300, 232, 150, (246, 236, 214, 255), outline=(150, 130, 96, 255))
-    wavy_ellipse(d, 256, 304, 206, 126, (234, 218, 182, 255), waves=0, depth=0)
+    # --- paper tray, seen from the front left; the right side shows the pleated rim
+    tray = new_layer()
+    td = ImageDraw.Draw(tray)
+    outer = [(96, 150), (250, 128), (420, 132), (470, 150), (502, 196), (508, 300), (496, 368), (452, 392),
+             (300, 420), (120, 452), (40, 440), (22, 360), (30, 250), (54, 190)]
+    td.polygon(outer, fill=(250, 249, 244, 255))
+    # pleats on the rim
+    cx0, cy0 = 280, 290
+    for i in range(90):
+        a = i / 90 * math.tau
+        x1, y1 = cx0 + math.cos(a) * 250, cy0 + math.sin(a) * 170
+        td.line([cx0 + math.cos(a) * 190, cy0 + math.sin(a) * 120, x1, y1], fill=(222, 220, 214, 255), width=2)
+    rim = new_layer()
+    ImageDraw.Draw(rim).polygon(outer, fill=(255, 255, 255, 255))
+    tray = clip(tray, rim.getchannel("A"))
+    td = ImageDraw.Draw(tray)
+    inner = [(110, 172), (255, 152), (410, 156), (452, 172), (476, 210), (480, 300), (468, 350), (432, 368),
+             (300, 394), (130, 424), (64, 414), (48, 350), (54, 260), (74, 206)]
+    td.polygon(inner, fill=(240, 230, 204, 255))
+    td.line(inner + [inner[0]], fill=(214, 204, 178, 255), width=3)
+    with_shadow(out, tray, offset=(4, 14), blur=12, alpha=120)
 
-    fry = (246, 204, 80) if baked else (240, 226, 178)
-    fry_edge = (252, 230, 140) if baked else (248, 240, 208)
-    fry_dark = (206, 142, 40) if baked else (220, 200, 148)
-    chips = []
-    for _ in range(30):                                   # a pile of thick chips on the left
-        x, y = rng.uniform(70, 250), rng.uniform(150, 330)
-        chips.append((y + abs(x - 160) * -0.2, x, rng.uniform(-1.0, 0.6)))
-    for y, x, a in sorted(chips):
-        w, h = rng.uniform(84, 112), rng.uniform(30, 38)
-        rot_rect(d, x, y + 5, w, h, a, fry_dark + (255,))
-        rot_rect(d, x, y, w, h, a, fry + (255,))
-        rot_rect(d, x - 2, y - 4, w - 10, h * 0.42, a, fry_edge + (255,))
-        for _ in range(4):
-            fx, fy = x + rng.uniform(-w * 0.35, w * 0.35), y + rng.uniform(-h * 0.2, h * 0.3)
-            d.ellipse([fx - 2, fy - 1, fx + 3, fy + 2], fill=lerp(fry, (180, 110, 30), 0.5) + (255,))
-
-    meat = (176, 84, 50) if baked else (214, 134, 122)
-    inner = (222, 196, 160) if baked else (238, 176, 164)
+    # --- Currywurst in sauce on the right
+    wurst = new_layer()
+    wd = ImageDraw.Draw(wurst)
+    meat_face = (234, 214, 184) if baked else (232, 168, 158)
+    meat_skin = (196, 120, 76) if baked else (210, 128, 118)
     if baked:
-        blob(d, 352, 292, 98, 54, (118, 30, 16, 255), rng, jitter=0.15, rot=0.1)               # sauce pool
-    chunks = [(300, 262, -0.4), (372, 244, 0.3), (410, 300, -0.2), (330, 322, 0.15), (392, 352, 0.4), (278, 308, 0.5)]
-    for x, y, a in chunks:
-        blob(d, x, y + 8, 44, 26, lerp(meat, (40, 14, 8), 0.4) + (255,), rng, jitter=0.1, rot=a)
-        blob(d, x, y, 44, 27, meat + (255,), rng, jitter=0.1, rot=a)
-        blob(d, x + 8, y - 4, 24, 14, inner + (255,), rng, jitter=0.12, rot=a + 0.3)           # cut face
+        blob(wd, 372, 268, 128, 108, (122, 26, 12, 255), rng, jitter=0.12, rot=0.2)        # the pool of sauce
+        blob(wd, 380, 262, 112, 92, (150, 36, 16, 255), rng, jitter=0.15, rot=0.2)
+    chunks = [(300, 168, 0.3, 30, 20), (352, 214, 0.0, 34, 22), (414, 246, 0.4, 32, 22), (300, 268, -0.3, 34, 24),
+              (430, 326, 0.2, 30, 24), (356, 320, 0.5, 34, 22), (418, 196, -0.2, 30, 20), (300, 340, 0.1, 30, 20)]
+    for x, y, a, rx, ry in chunks:
+        blob(wd, x, y + 6, rx, ry, lerp(meat_skin, (60, 20, 10), 0.35) + (255,), rng, jitter=0.12, rot=a)
+        blob(wd, x, y, rx, ry, meat_skin + (255,), rng, jitter=0.12, rot=a)
+        blob(wd, x + rx * 0.3, y + ry * 0.25, rx * 0.5, ry * 0.45, meat_face + (255,), rng, jitter=0.1, rot=a)
         if baked:
-            blob(d, x - 4, y + 1, 40, 22, (150, 38, 18, 215), rng, jitter=0.2, rot=a)         # dark red sauce
-            blob(d, x - 10, y - 8, 8, 3, (255, 214, 190, 200), rng, jitter=0.2, rot=a)        # shine
+            # sauce running over the chunk, leaving only an edge of the cut face visible
+            blob(wd, x - rx * 0.25, y - ry * 0.2, rx * 0.95, ry * 0.85, (170, 42, 18, 240), rng, jitter=0.3, rot=a)
     if baked:
-        for cx, cy, r in ((352, 268, 46), (404, 318, 26), (306, 300, 22)):                    # curry powder in heaps
-            blob(d, cx, cy, r, r * 0.55, (214, 138, 26, 235), rng, jitter=0.35)
-            for _ in range(int(r * 1.2)):
-                x, y = cx + rng.uniform(-r, r), cy + rng.uniform(-r * 0.5, r * 0.5)
-                d.ellipse([x - 3, y - 2, x + 3, y + 2], fill=lerp((236, 178, 44), (255, 210, 90), rng.random()) + (255,))
-        # mayo: a big creamy blob on the chips with a drip and a peak
-        for k, (rx, ry) in enumerate(((78, 44), (62, 40), (44, 32), (26, 22))):
-            blob(d, 150, 214 - k * 12, rx, ry, lerp((250, 246, 232), (224, 222, 226), k * 0.12) + (255,), rng, jitter=0.1, rot=0.15)
-        blob(d, 120, 270, 16, 26, (248, 244, 230, 255), rng, jitter=0.1)
-        d.ellipse([136, 170, 154, 184], fill=(255, 255, 255, 255))
-    # wooden pick in the sauce
-    rot_rect(d, 296, 164, 150, 17, -0.38, (206, 160, 104, 255), outline=(130, 96, 52, 255))
-    return shade(layer, 0.2)
+        for _ in range(9):                                                                   # runny sauce
+            blob(wd, rng.uniform(270, 470), rng.uniform(170, 360), rng.uniform(16, 30), rng.uniform(8, 14),
+                 (rng.randint(150, 196), rng.randint(30, 50), 16, 230), rng, jitter=0.3)
+        for cx, cy, r in ((364, 256, 50), (300, 214, 26), (418, 290, 28), (330, 316, 20)):  # curry powder heaps
+            blob(wd, cx, cy, r, r * 0.6, (190, 120, 34, 245), rng, jitter=0.35)
+            for _ in range(int(r * 6)):
+                x, y = cx + rng.gauss(0, r * 0.45), cy + rng.gauss(0, r * 0.28)
+                col = lerp((214, 150, 40), (240, 196, 80), rng.random()) if rng.random() < 0.7 else (150, 86, 24)
+                wd.ellipse([x - 1.6, y - 1.6, x + 1.6, y + 1.6], fill=col + (255,))
+        for _ in range(140):                                                                 # sprinkled powder
+            x, y = rng.uniform(270, 470), rng.uniform(170, 360)
+            wd.ellipse([x - 1.3, y - 1.3, x + 1.3, y + 1.3], fill=(216, 154, 46, 220))
+        gloss(wurst, [(330, 190, 20, 7, 150), (440, 230, 16, 6, 140), (390, 336, 22, 7, 130), (300, 300, 14, 5, 140),
+                      (448, 300, 10, 5, 150), (272, 240, 10, 4, 120)], blur=3)
+    with_shadow(out, wurst, offset=(3, 6), blur=6, alpha=90)
+
+    # --- chips: the back of the pile, then the mayo, then the chips in front
+    back = new_layer()
+    bd = ImageDraw.Draw(back)
+    for cx, cy, ang, length in ((96, 186, -0.30, 170), (170, 170, -0.15, 150), (232, 186, 0.10, 130), (54, 236, -0.55, 150),
+                                (130, 222, 0.05, 170), (196, 230, -0.35, 150), (60, 292, -0.05, 150), (250, 214, 0.85, 168),
+                                (120, 300, 0.10, 160), (210, 296, -0.15, 140)):
+        draw_fry(bd, rng, cx, cy, length, ang, 34, raw)
+    with_shadow(out, back, offset=(5, 9), blur=6, alpha=90)
+
+    if baked:
+        mayo = new_layer()
+        md = ImageDraw.Draw(mayo)
+        cream = (246, 238, 206)
+        blob(md, 130, 256, 96, 68, (222, 210, 172, 255), rng, jitter=0.1, rot=0.1)
+        blob(md, 126, 246, 94, 66, cream + (255,), rng, jitter=0.1, rot=0.1)
+        blob(md, 150, 206, 60, 44, cream + (255,), rng, jitter=0.12, rot=-0.2)
+        blob(md, 162, 182, 30, 22, (250, 245, 222, 255), rng, jitter=0.12)
+        blob(md, 92, 300, 16, 30, cream + (255,), rng, jitter=0.1)                          # a drip
+        blob(md, 96, 330, 12, 10, cream + (255,), rng, jitter=0.1)
+        md.arc([70, 222, 196, 300], 30, 140, fill=(234, 224, 192, 255), width=3)           # soft folds
+        md.arc([110, 190, 196, 250], 210, 310, fill=(238, 228, 198, 255), width=2)
+        gloss(mayo, [(116, 214, 30, 14, 230), (156, 192, 16, 8, 240), (88, 262, 10, 6, 200)], blur=5)
+        with_shadow(out, mayo, offset=(4, 8), blur=7, alpha=100)
+
+    front = new_layer()
+    fd = ImageDraw.Draw(front)
+    for cx, cy, ang, length in ((40, 372, -1.30, 170), (160, 372, -0.66, 236), (206, 360, -0.70, 170),
+                                (276, 392, 0.46, 150), (110, 410, -0.20, 150), (238, 270, 0.88, 150)):
+        draw_fry(fd, rng, cx, cy, length, ang, 36, raw)
+    with_shadow(out, front, offset=(5, 10), blur=6, alpha=100)
+    return shade(out, 0.15)
 
 
 def draw_entenbox():
