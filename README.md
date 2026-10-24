@@ -1,6 +1,6 @@
 # Verler Leben
 
-**Verler Leben** ist ein Valheim-Mod mit zwei Festmahlen (Feasts) für den Servierteller: der **Spexarder Pizza** und dem **Kaunitzer Teller**. Beide stammen aus der Dönerbude um die Ecke, beide müssen im Steinofen gebacken werden, und beide geben richtig viel Leben und Ausdauer.
+**Verler Leben** ist ein Valheim-Mod mit drei Festmahlen (Feasts) für den Servierteller: der **Spexarder Pizza**, dem **Kaunitzer Teller** und der **Mantaplatte**, dazu die **Entenbox** von der Kirmes. Die Feasts stammen aus der Dönerbude und vom Imbiss um die Ecke, müssen im Steinofen gebacken werden und geben richtig viel Leben und Ausdauer.
 
 <p>
   <img src="Assets/pizza.png" width="96" alt="Spexarder Pizza">
@@ -19,6 +19,7 @@ In Valheim gibt es Feasts: ein großes Festmahl aus vielen kleinen Speisen. Du s
 | --- | --- | --- | --- | --- | --- |
 | **Kaunitzer Teller**: Döner und Pommes in der Aluschale, dick mit Käse überbacken. Ein Leben-Essen (rot) | 100 | 50 | 7 | 60 Min. | 10 |
 | **Spexarder Pizza**: deftige, fettige Pizza mit ordentlich Dönerfleisch. Ausgeglichen und sehr sättigend | 80 | 80 | 6 | 80 Min. | 10 |
+| **Mantaplatte**: Currywurst und Pommes mit Mayo. Der Klassiker vom Imbiss | 85 | 65 | 6 | 65 Min. | 10 |
 
 Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minuten, das der Nebelwelt 65/65 und das von Ashlands 75/75, jeweils 50 Minuten. Dafür brauchen die Gerichte Zutaten aus den Ebenen, den Bergen und der Nebelwelt. Fleisch und Käse kommen von der Kuh, die du selbst hältst.
 
@@ -49,11 +50,16 @@ In den **Ebenen** laufen jetzt Kühe herum, dort wachsen auch Gerste und Flachs,
    | --- | --- |
    | Kaunitzer Teller (roh) | 6 Dönerfleisch, 4 Käse, 5 Karotten (die Pommes), 3 Zwiebeln, 2 Jotunn-Pilze, 1 Berg-Gewürz |
    | Spexarder Pizza (roh) | 4 Brotteig, 8 Dönerfleisch, 6 Käse, 4 Wolkenbeeren (die Soße), 2 Magecap-Pilze, 2 Zwiebeln, 1 Berg-Gewürz |
+   | Mantaplatte (roh) | 6 Würste, 4 Karotten (die Pommes), 3 Himbeeren (die Currysoße), 2 Eier (die Mayo), 1 Berg-Gewürz |
 
 3. **Backen** im Steinofen (Stone Oven), 60 Sekunden. Heraus kommt das fertige Gericht.
 4. Mit dem **Servierteller** auf den Tisch stellen und gemeinsam essen.
 
 Das Berg-Gewürz gibt es nicht zu farmen, es kommt wie bei den Feasts aus dem Hauptspiel von der Sumpfhexe. Alle Rezepte, Stationen, Werte und Backzeiten lassen sich in der Config ändern (siehe [Konfiguration](#konfiguration)).
+
+## Die Entenbox
+
+Die gelbe Box mit dem Entengesicht von der Kirmes: frittierte Teigbällchen mit Zimtzucker und Erdbeersoße, auf Holzspießen. Ein schneller Snack am **Kessel** aus 1 Brotteig, 1 Honig und 2 Himbeeren (ergibt 2). Er gibt **Eitr**, dazu ein bisschen Leben und Ausdauer, 15 Minuten lang: 15 Leben, 20 Ausdauer, 45 Eitr. Alle Werte stehen in der Config unter `[Entenbox]`.
 
 ## Schroeders Boonekamp
 
@@ -62,7 +68,7 @@ Der **Verler Boonekamp** der Likör Manufaktur Schroeders vom Kirchplatz in Verl
 | Wirkung | Lebens- / Ausdauer-Regeneration |
 | --- | --- |
 | Boonekamp allein (5 Minuten) | +25 % / +15 % |
-| dazu ein Teller oder eine Pizza als aktives Essen | +15 % / +10 % |
+| dazu ein Teller, eine Pizza oder eine Mantaplatte als aktives Essen | +15 % / +10 % |
 | dazu irgendein Met | +10 % / +8 % |
 | dazu **Gerstenwein**, das „kühle Bier“ des Spiels | +15 % / +10 % |
 
@@ -128,7 +134,7 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
 
 Nach dem ersten Start mit dem Mod liegt die Datei `BepInEx/config/felix.verlerleben.cfg` im Valheim-Ordner. Änderungen greifen nach einem Neustart des Spiels.
 
-Die Abschnitte `[Teller]` und `[Pizza]` (die Feasts):
+Die Abschnitte `[Teller]`, `[Pizza]` und `[Manta]` (die Feasts):
 
 | Schlüssel | Bedeutung |
 | --- | --- |

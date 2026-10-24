@@ -21,7 +21,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.2.2";
+        public const string PluginVersion = "1.3.0";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -70,6 +70,25 @@ namespace VerlerLeben
                 Ingredients = "BreadDough:4,DF_Doener:8,DF_Kaese:6,Cloudberry:4,MushroomMagecap:2,Onion:2,SpiceMountains:1",
                 Health = 80f, Stamina = 80f, Regen = 6f, BurnSeconds = 4800f,
             },
+            // Currywurst and fries with mayo on one big plate.
+            new Dish
+            {
+                Key = "Manta", RawPrefab = "DF_MantaRaw", MaterialPrefab = "DF_Manta_Material", FeastPrefab = "DF_FeastManta",
+                BaseMaterial = "FeastSwamps_Material", BaseFeast = "FeastSwamps",
+                Ingredients = "Sausages:6,Carrot:4,Raspberry:3,ChickenEgg:2,SpiceMountains:1",
+                Health = 85f, Stamina = 65f, Regen = 6f, BurnSeconds = 3900f,
+            },
+        };
+
+        // The yellow duck box from the Kirmes: fried dough balls with cinnamon sugar and strawberry sauce.
+        private readonly Snack[] _snacks =
+        {
+            new Snack
+            {
+                Key = "Entenbox", PrefabName = "DF_Entenbox", BasePrefab = "Bread",
+                Ingredients = "BreadDough:1,Honey:1,Raspberry:2", Amount = 2,
+                Health = 15f, Stamina = 20f, Eitr = 45f, Regen = 1f, BurnSeconds = 900f,
+            },
         };
 
         private void Awake()
@@ -84,10 +103,15 @@ namespace VerlerLeben
                 dish.Bind(Config);
             }
 
+            foreach (Snack snack in _snacks)
+            {
+                snack.Bind(Config);
+            }
+
             _cow.Bind(Config);
             _boonekamp.Bind(Config);
 
-            SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza" });
+            SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza", "$item_df_manta" });
             new Harmony(PluginGUID).PatchAll(typeof(VerlerLebenPlugin).Assembly);
 
             AddLocalizations();
@@ -98,7 +122,7 @@ namespace VerlerLeben
 
         private void AddLocalizations()
         {
-            Dish teller = Get("Teller"), pizza = Get("Pizza");
+            Dish teller = Get("Teller"), pizza = Get("Pizza"), manta = Get("Manta");
             CustomLocalization loc = LocalizationManager.Instance.GetLocalization();
 
             loc.AddTranslation("English", new Dictionary<string, string>
@@ -135,6 +159,14 @@ namespace VerlerLeben
                 { "item_df_pizza_raw_desc", "Pizza dough with sauce, cheese and a mountain of Döner meat. Needs to be baked in the stone oven." },
                 { "item_df_pizza", "Spexarder Pizza" },
                 { "item_df_pizza_desc", $"Greasy, hearty and very filling. Plenty of Döner meat under golden cheese. Health and stamina for {Minutes(pizza)} minutes." },
+
+                { "item_df_manta_raw", "Mantaplatte (raw)" },
+                { "item_df_manta_raw_desc", "Currywurst and fries with mayo on one big plate. Needs to be baked in the stone oven." },
+                { "item_df_manta", "Mantaplatte" },
+                { "item_df_manta_desc", $"The classic from the snack bar: Currywurst and fries with mayo. Health and stamina for {Minutes(manta)} minutes." },
+
+                { "item_df_entenbox", "Duck Box" },
+                { "item_df_entenbox_desc", "Fried dough balls with cinnamon sugar and strawberry sauce from the Kirmes, in the yellow box with the duck face. A little Eitr for a short time." },
             });
 
             loc.AddTranslation("German", new Dictionary<string, string>
@@ -171,6 +203,14 @@ namespace VerlerLeben
                 { "item_df_pizza_raw_desc", "Pizzateig mit Soße, Käse und einem Berg Dönerfleisch. Muss im Steinofen gebacken werden." },
                 { "item_df_pizza", "Spexarder Pizza" },
                 { "item_df_pizza_desc", $"Deftig, fettig und sehr sättigend. Ordentlich Dönerfleisch unter goldenem Käse. Leben und Ausdauer für {Minutes(pizza)} Minuten." },
+
+                { "item_df_manta_raw", "Mantaplatte (roh)" },
+                { "item_df_manta_raw_desc", "Currywurst und Pommes mit Mayo auf einer großen Platte. Muss im Steinofen gebacken werden." },
+                { "item_df_manta", "Mantaplatte" },
+                { "item_df_manta_desc", $"Der Klassiker von der Imbissbude: Currywurst und Pommes mit Mayo. Leben und Ausdauer für {Minutes(manta)} Minuten." },
+
+                { "item_df_entenbox", "Entenbox" },
+                { "item_df_entenbox_desc", "Frittierte Teigbällchen mit Zimtzucker und Erdbeersoße von der Kirmes, in der gelben Box mit dem Entengesicht. Ein bisschen Eitr für kurze Zeit." },
             });
         }
 
@@ -218,6 +258,18 @@ namespace VerlerLeben
                 catch (Exception e)
                 {
                     Logger.LogError($"Failed to add {_boonekamp.PrefabName}: {e}");
+                }
+            }
+
+            foreach (Snack snack in _snacks.Where(n => n.Enabled))
+            {
+                try
+                {
+                    AddSnack(snack);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Failed to add {snack.PrefabName}: {e}");
                 }
             }
 
@@ -294,6 +346,30 @@ namespace VerlerLeben
             var item = new CustomItem(drink.PrefabName, "MeadStaminaMinor", config);
             item.ItemDrop.m_itemData.m_shared.m_consumeStatusEffect = effect;
             item.ItemPrefab.transform.localScale *= 0.85f;
+            ItemManager.Instance.AddItem(item);
+        }
+
+        private void AddSnack(Snack snack)
+        {
+            var config = new ItemConfig
+            {
+                Name = $"$item_{snack.Token}",
+                Description = $"$item_{snack.Token}_desc",
+                CraftingStation = CraftingStations.GetInternalName(snack.CraftingStation),
+                Amount = Mathf.Max(1, snack.Amount),
+                Requirements = ParseRequirements(snack.PrefabName, snack.Ingredients),
+                Icon = LoadIcon(snack.IconResource),
+                Weight = snack.Weight,
+                StackSize = snack.StackSize,
+            };
+
+            var item = new CustomItem(snack.PrefabName, snack.BasePrefab, config);
+            ItemDrop.ItemData.SharedData shared = item.ItemDrop.m_itemData.m_shared;
+            shared.m_food = snack.Health;
+            shared.m_foodStamina = snack.Stamina;
+            shared.m_foodEitr = snack.Eitr;
+            shared.m_foodRegen = snack.Regen;
+            shared.m_foodBurnTime = snack.BurnSeconds;
             ItemManager.Instance.AddItem(item);
         }
 

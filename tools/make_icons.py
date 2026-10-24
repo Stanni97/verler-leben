@@ -2,7 +2,7 @@
 
 Usage: python3 make_icons.py OUT_DIR [SIZE]
   Writes doener.png, kaese.png, teller.png, tellerraw.png, pizza.png, pizzaraw.png, milch.png,
-  rindfleisch.png and boonekamp.png.
+  rindfleisch.png, boonekamp.png, manta.png, mantaraw.png and entenbox.png.
   SIZE defaults to 128 (item icons).
 
 Everything is drawn from simple shapes. The baked dishes follow photos of the real thing:
@@ -320,6 +320,74 @@ def draw_boonekamp():
     return shade(layer, 0.2)
 
 
+def draw_manta(baked):
+    """Mantaplatte: Currywurst slices and fries with a swirl of mayo on a white plate."""
+    rng = random.Random(71 if baked else 72)
+    cx, cy, rx, ry = 256, 262, 214, 170
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    if baked:
+        d.ellipse([cx - rx - 26, cy - ry - 18, cx + rx + 26, cy + ry + 26], fill=(226, 228, 232, 255))
+        d.ellipse([cx - rx - 12, cy - ry - 8, cx + rx + 12, cy + ry + 14], fill=(246, 247, 249, 255))
+    else:
+        d.ellipse([cx - rx + 10, cy - ry + 10, cx + rx - 10, cy + ry - 10], fill=(238, 240, 244, 255))
+    fry = (240, 196, 72) if baked else (238, 222, 170)
+    for _ in range(26):                                              # fries on the left
+        x, y = rng.uniform(110, 270), rng.uniform(170, 350)
+        a = rng.uniform(-0.9, 0.9)
+        dx, dy = math.cos(a) * 52, math.sin(a) * 52
+        d.line([x - dx, y - dy, x + dx, y + dy], fill=lerp(fry, (150, 96, 30), rng.uniform(0, 0.35)) + (255,), width=17)
+    meat = (150, 74, 44) if baked else (206, 130, 118)
+    for i in range(6):                                               # sausage slices on the right
+        x, y = 300 + (i % 3) * 52 + rng.uniform(-6, 6), 190 + (i // 3) * 82 + rng.uniform(-6, 6)
+        d.ellipse([x - 32, y - 28, x + 32, y + 28], fill=lerp(meat, (50, 20, 10), 0.35) + (255,))
+        d.ellipse([x - 28, y - 25, x + 28, y + 23], fill=meat + (255,))
+        d.ellipse([x - 12, y - 10, x + 12, y + 8], fill=lerp(meat, (255, 220, 200), 0.3) + (255,))
+    if baked:
+        for _ in range(7):                                           # curry ketchup over the sausage
+            x, y = rng.uniform(290, 430), rng.uniform(180, 340)
+            blob(d, x, y, rng.uniform(16, 28), rng.uniform(10, 18), (196, 56, 28, 255), rng, jitter=0.35)
+        for _ in range(60):                                          # curry powder
+            x, y = rng.uniform(290, 440), rng.uniform(180, 350)
+            d.ellipse([x - 3, y - 2, x + 3, y + 2], fill=(236, 178, 44, 255))
+    mayo = (252, 248, 238, 255)
+    for k in range(3):                                               # mayo swirl on the fries
+        blob(d, 232 + k * 6, 262 - k * 3, 62 - k * 14, 30 - k * 7, mayo, rng, jitter=0.12, rot=0.2)
+    d.ellipse([228, 246, 256, 262], fill=(244, 238, 222, 255))
+    return shade(layer, 0.25)
+
+
+def draw_entenbox():
+    """The yellow duck-face takeaway box with fried dough balls, cinnamon sugar and strawberry sauce."""
+    rng = random.Random(61)
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    d.polygon([(126, 168), (386, 168), (366, 262), (146, 262)], fill=(238, 228, 202, 255), outline=(120, 100, 60, 255))
+    d.rounded_rectangle([200, 140, 312, 182], radius=18, fill=(238, 228, 202, 255), outline=(120, 100, 60, 255), width=5)
+    d.ellipse([236, 150, 276, 172], fill=(60, 60, 60, 120))                       # handle slot
+    for _ in range(12):                                                           # dough balls
+        x, y, r = rng.uniform(172, 340), rng.uniform(190, 252), rng.uniform(22, 32)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(196, 130, 48, 255))
+        d.ellipse([x - r + 3, y - r + 3, x + r - 5, y + r - 6], fill=(228, 166, 64, 255))
+        for _ in range(7):
+            sx, sy = x + rng.uniform(-r * 0.7, r * 0.7), y + rng.uniform(-r * 0.7, r * 0.5)
+            d.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=(246, 226, 190, 255))   # cinnamon sugar
+        if rng.random() < 0.6:
+            blob(d, x + rng.uniform(-8, 8), y + rng.uniform(-6, 6), r * 0.55, r * 0.3, (214, 52, 60, 255), rng, jitter=0.3)
+    for x0, x1 in ((206, 224), (284, 296)):                                       # wooden skewers
+        d.line([x0, 96, x1, 236], fill=(204, 168, 108, 255), width=8)
+    d.polygon([(148, 256), (364, 256), (346, 474), (166, 474)], fill=(252, 216, 40, 255), outline=(120, 90, 10, 255))
+    for ex in (212, 300):                                                         # eyes
+        d.ellipse([ex - 34, 312, ex + 34, 386], fill=(255, 255, 255, 255), outline=(40, 30, 10, 255), width=5)
+        d.ellipse([ex - 16, 330, ex + 14, 372], fill=(20, 20, 24, 255))
+        d.ellipse([ex - 8, 336, ex + 2, 348], fill=(255, 255, 255, 255))
+    d.arc([176, 296, 250, 330], 200, 340, fill=(40, 30, 10, 255), width=7)       # brows
+    d.arc([262, 296, 336, 330], 200, 340, fill=(40, 30, 10, 255), width=7)
+    d.ellipse([222, 396, 290, 446], fill=(255, 150, 30, 255), outline=(150, 70, 10, 255), width=5)   # beak
+    d.ellipse([240, 418, 272, 438], fill=(206, 60, 70, 255))
+    return shade(layer, 0.2)
+
+
 def finish(layer):
     """Dark outline and soft drop shadow, like vanilla Valheim icons."""
     alpha = layer.getchannel("A")
@@ -336,7 +404,8 @@ os.makedirs(OUT_DIR, exist_ok=True)
 for name, layer in (("doener", draw_doener()), ("kaese", draw_kaese()),
                     ("teller", draw_tray(True)), ("tellerraw", draw_tray(False)),
                     ("pizza", draw_pizza(True)), ("pizzaraw", draw_pizza(False)),
-                    ("milch", draw_milch()), ("rindfleisch", draw_rindfleisch()), ("boonekamp", draw_boonekamp())):
+                    ("milch", draw_milch()), ("rindfleisch", draw_rindfleisch()), ("boonekamp", draw_boonekamp()),
+                    ("manta", draw_manta(True)), ("mantaraw", draw_manta(False)), ("entenbox", draw_entenbox())):
     path = os.path.join(OUT_DIR, f"{name}.png")
     finish(layer).save(path)
     print("wrote", path)

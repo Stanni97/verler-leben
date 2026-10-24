@@ -137,4 +137,39 @@ namespace VerlerLeben
                 "Extra stamina regeneration while barley wine is active, in percent.").Value;
         }
     }
+
+    /// <summary>A quick snack: a food that gives a little health, stamina and Eitr for a short time.</summary>
+    internal sealed class Snack
+    {
+        public string Key;
+        public string PrefabName;
+        public string BasePrefab;
+        public float Weight = 0.3f;
+        public int StackSize = 20;
+
+        public bool Enabled = true;
+        public string CraftingStation = nameof(CraftingStations.Cauldron);
+        public string Ingredients = "";
+        public int Amount = 1;
+        public float Health, Stamina, Eitr, Regen;
+        public float BurnSeconds = 900f;
+
+        public string Token => "df_" + Key.ToLowerInvariant();
+        public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
+
+        public void Bind(ConfigFile config)
+        {
+            string s = Key;
+            Enabled = config.Bind(s, "Enabled", Enabled, "Adds this snack to the game.").Value;
+            CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
+                new ConfigDescription("Where the snack is made.", CraftingStations.GetAcceptableValueList())).Value;
+            Ingredients = config.Bind(s, "Ingredients", Ingredients, "Comma separated list of ItemPrefab:Amount.").Value;
+            Amount = config.Bind(s, "Amount", Amount, "Snacks produced per craft.").Value;
+            Health = config.Bind(s, "Health", Health, "Health when eaten.").Value;
+            Stamina = config.Bind(s, "Stamina", Stamina, "Stamina when eaten.").Value;
+            Eitr = config.Bind(s, "Eitr", Eitr, "Eitr when eaten.").Value;
+            Regen = config.Bind(s, "HealthRegen", Regen, "Health regeneration per tick while the food lasts.").Value;
+            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, "How long the food lasts after eating, in seconds.").Value;
+        }
+    }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+- Neues Feast **Mantaplatte** (Currywurst und Pommes mit Mayo): 85 Leben, 65 Ausdauer, 65 Minuten. Roh am Zubereitungstisch aus 6 Würsten, 4 Karotten, 3 Himbeeren, 2 Eiern und 1 Berg-Gewürz, dann im Steinofen backen. Zählt auch für den Feast-Bonus des Boonekamp.
+- Neuer Snack **Entenbox** von der Kirmes (frittierte Teigbällchen mit Zimtzucker und Erdbeersoße) am Kessel aus 1 Brotteig, 1 Honig und 2 Himbeeren. Gibt 45 Eitr, 15 Leben und 20 Ausdauer für 15 Minuten.
+
 ## 1.2.2
 
 - Die Kühe leben jetzt in den **Ebenen** statt in den Wiesen, dort wachsen auch Gerste und Flachs, ihr Futter. In der Config unter `[Cow]` stellt `SpawnBiome` das Biom ein (Plains, Meadows, BlackForest, Swamp, Mountain, Mistlands). Schon vorhandene Kühe in den Wiesen bleiben, wo sie sind.
