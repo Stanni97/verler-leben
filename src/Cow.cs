@@ -28,6 +28,9 @@ namespace VerlerLeben
 
         internal static CowSettings Settings;
 
+        private static CustomCreature _cow;
+        private static GameObject _cowPrefab, _calfPrefab, _cowRagdoll, _calfRagdoll;
+
         public static void Add(CowSettings settings, ManualLogSource log)
         {
             Settings = settings;
@@ -92,8 +95,8 @@ namespace VerlerLeben
                 else
                 {
                     // On death the game puts a ragdoll in place of the creature. Without our own, a Lox would fall over.
-                    ReplaceRagdoll(cow.Prefab, "lox_ragdoll", CowPrefab + "_ragdoll", settings.Scale, log);
-                    ReplaceRagdoll(calf.Prefab, "loxcalf_ragdoll", CalfPrefab + "_ragdoll", settings.Scale * 0.75f, log);
+                    _cowRagdoll = ReplaceRagdoll(cow.Prefab, "lox_ragdoll", CowPrefab + "_ragdoll", settings.Scale, log);
+                    _calfRagdoll = ReplaceRagdoll(calf.Prefab, "loxcalf_ragdoll", CalfPrefab + "_ragdoll", settings.Scale * 0.75f, log);
                 }
             }
             catch (Exception e)
@@ -103,25 +106,93 @@ namespace VerlerLeben
 
             CreatureManager.Instance.AddCreature(calf);
             CreatureManager.Instance.AddCreature(cow);
+            _cow = cow;
+            _cowPrefab = cow.Prefab;
+            _calfPrefab = calf.Prefab;
             log.LogInfo("Added " + CowPrefab + " and " + CalfPrefab + ".");
         }
 
+        /// <summary>
+        /// Applies changed settings (e.g. from the server): the spawn, the prefabs for new cows and the cows already loaded.
+        /// Turned off, cows no longer spawn; tame ones stay.
+        /// </summary>
+        public static void Apply(CowSettings settings)
+        {
+            Settings = settings;
+            if (_cow == null)
+            {
+                return;
+            }
+
+            foreach (SpawnSystem.SpawnData spawn in _cow.Spawns)
+            {
+                spawn.m_enabled = settings.Enabled;
+                spawn.m_biome = settings.SpawnBiome;
+                spawn.m_maxSpawned = Mathf.Max(1, settings.SpawnMax);
+                spawn.m_spawnChance = Mathf.Clamp(settings.SpawnChance, 1f, 100f);
+                spawn.m_groupSizeMin = Mathf.Max(1, settings.GroupMin);
+                spawn.m_groupSizeMax = Mathf.Max(settings.GroupMin, settings.GroupMax);
+            }
+
+            _cowPrefab.transform.localScale = Vector3.one * settings.Scale;
+            _calfPrefab.transform.localScale = Vector3.one * (settings.Scale * 0.75f);
+            if (_cowRagdoll != null)
+            {
+                _cowRagdoll.transform.localScale = Vector3.one * settings.Scale;
+            }
+
+            if (_calfRagdoll != null)
+            {
+                _calfRagdoll.transform.localScale = Vector3.one * (settings.Scale * 0.75f);
+            }
+
+            _cowPrefab.GetComponent<Humanoid>().m_health = settings.Health;
+            SetTaming(_cowPrefab.GetComponent<Tameable>(), settings);
+            _calfPrefab.GetComponent<Growup>().m_growTime = settings.GrowSeconds;
+
+            foreach (Character character in Character.GetAllCharacters())
+            {
+                if (character == null)
+                {
+                    continue;
+                }
+
+                if (character.GetComponent<DfCow>() != null)
+                {
+                    SetTaming(character.GetComponent<Tameable>(), settings);
+                }
+                else if (character.GetComponent<Growup>() is Growup growup && growup.m_grownPrefab == _cowPrefab)
+                {
+                    growup.m_growTime = settings.GrowSeconds;
+                }
+            }
+        }
+
+        private static void SetTaming(Tameable tameable, CowSettings settings)
+        {
+            if (tameable != null)
+            {
+                tameable.m_tamingTime = settings.TamingSeconds;
+                tameable.m_fedDuration = settings.FedSeconds;
+            }
+        }
+
         /// <summary>A copy of the Lox ragdoll with the cow model, in the death effects of the cow instead of the original.</summary>
-        private static void ReplaceRagdoll(GameObject creature, string originalName, string name, float scale, ManualLogSource log)
+        private static GameObject ReplaceRagdoll(GameObject creature, string originalName, string name, float scale, ManualLogSource log)
         {
             GameObject original = PrefabManager.Instance.GetPrefab(originalName);
             var character = creature.GetComponent<Character>();
             if (original == null || character == null)
             {
                 log.LogWarning("Ragdoll " + originalName + " not found, the " + creature.name + " falls over as a Lox.");
-                return;
+                return null;
             }
 
             GameObject ragdoll = PrefabManager.Instance.CreateClonedPrefab(name, original);
             if (ragdoll == null || !CowModel.Apply(ragdoll, ragdoll: true))
             {
                 log.LogWarning("Could not build the ragdoll " + name + ".");
-                return;
+                return null;
             }
 
             ragdoll.transform.localScale = Vector3.one * scale;
@@ -133,6 +204,8 @@ namespace VerlerLeben
                     effect.m_prefab = ragdoll;
                 }
             }
+
+            return ragdoll;
         }
 
         private static void ConfigureCow(GameObject cow, GameObject calf, CowSettings settings)
@@ -332,23 +405,23 @@ namespace VerlerLeben
         public void Bind(BepInEx.Configuration.ConfigFile config)
         {
             const string s = "Cow";
-            Enabled = config.Bind(s, "Enabled", Enabled, "Adds the cow, her calf, milk and beef to the game.").Value;
+            Enabled = config.Bind(s, "Enabled", Enabled, ServerSync.Desc("Cows spawn in the wild. Off: no new cows spawn; tame cows, milk and beef stay.")).Value;
             SpawnBiome = config.Bind(s, "SpawnBiome", SpawnBiome,
-                "Where the cows live. Plains is where Barley and Flax, their food, grow. Meadows, BlackForest, Swamp, Mountain or Mistlands work too.").Value;
-            SpawnMax = config.Bind(s, "SpawnMax", SpawnMax, "How many cows spawn around you in that biome at most.").Value;
-            SpawnChance = config.Bind(s, "SpawnChancePercent", SpawnChance, "Chance per spawn attempt, in percent.").Value;
-            GroupMin = config.Bind(s, "GroupMin", GroupMin, "Smallest herd.").Value;
-            GroupMax = config.Bind(s, "GroupMax", GroupMax, "Largest herd.").Value;
-            Scale = config.Bind(s, "Scale", Scale, "Size compared to a Lox. The calf is three quarters of this.").Value;
-            Health = config.Bind(s, "Health", Health, "Health of a cow.").Value;
-            TamingSeconds = config.Bind(s, "TamingSeconds", TamingSeconds, "How long a fed cow needs to get tame (a Lox: 1800).").Value;
-            FedSeconds = config.Bind(s, "FedSeconds", FedSeconds, "How long a meal of Barley or Flax keeps a cow fed.").Value;
-            GrowSeconds = config.Bind(s, "CalfGrowSeconds", GrowSeconds, "How long a calf needs to grow up.").Value;
-            MilkCooldownSeconds = config.Bind(s, "MilkCooldownSeconds", MilkCooldownSeconds, "Time between two milkings of the same cow (one game day is 1800 s).").Value;
+                ServerSync.Desc("Where the cows live. Plains is where Barley and Flax, their food, grow. Meadows, BlackForest, Swamp, Mountain or Mistlands work too.")).Value;
+            SpawnMax = config.Bind(s, "SpawnMax", SpawnMax, ServerSync.Desc("How many cows spawn around you in that biome at most.")).Value;
+            SpawnChance = config.Bind(s, "SpawnChancePercent", SpawnChance, ServerSync.Desc("Chance per spawn attempt, in percent.")).Value;
+            GroupMin = config.Bind(s, "GroupMin", GroupMin, ServerSync.Desc("Smallest herd.")).Value;
+            GroupMax = config.Bind(s, "GroupMax", GroupMax, ServerSync.Desc("Largest herd.")).Value;
+            Scale = config.Bind(s, "Scale", Scale, ServerSync.Desc("Size compared to a Lox. The calf is three quarters of this.")).Value;
+            Health = config.Bind(s, "Health", Health, ServerSync.Desc("Health of a cow.")).Value;
+            TamingSeconds = config.Bind(s, "TamingSeconds", TamingSeconds, ServerSync.Desc("How long a fed cow needs to get tame (a Lox: 1800).")).Value;
+            FedSeconds = config.Bind(s, "FedSeconds", FedSeconds, ServerSync.Desc("How long a meal of Barley or Flax keeps a cow fed.")).Value;
+            GrowSeconds = config.Bind(s, "CalfGrowSeconds", GrowSeconds, ServerSync.Desc("How long a calf needs to grow up.")).Value;
+            MilkCooldownSeconds = config.Bind(s, "MilkCooldownSeconds", MilkCooldownSeconds, ServerSync.Desc("Time between two milkings of the same cow (one game day is 1800 s).")).Value;
             MilkKey = config.Bind(s, "MilkKey", MilkKey,
                 "Key to milk the cow you look at. E makes her follow you or wait, like a wolf. Not used by the game: H, Y, U, J, N.").Value;
-            MilkMin = config.Bind(s, "MilkMin", MilkMin, "Least milk per milking.").Value;
-            MilkMax = config.Bind(s, "MilkMax", MilkMax, "Most milk per milking.").Value;
+            MilkMin = config.Bind(s, "MilkMin", MilkMin, ServerSync.Desc("Least milk per milking.")).Value;
+            MilkMax = config.Bind(s, "MilkMax", MilkMax, ServerSync.Desc("Most milk per milking.")).Value;
         }
     }
 

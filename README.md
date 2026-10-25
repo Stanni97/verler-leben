@@ -123,6 +123,8 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
 
 `BepInExPack_Valheim`, `Jotunn.dll` und `VerlerLeben/VerlerLeben.dll` auf dem Server genauso ablegen. Unter Linux startest du den Server mit `start_server_bepinex.sh`, unter Windows ganz normal.
 
+Die Config des Servers (`BepInEx/config/felix.verlerleben.cfg` auf dem Server) gilt für alle Spieler, solange sie verbunden sind: Rezepte, Werte der Gerichte, Boonekamp und Kuh. Die eigene Config der Spieler bleibt dabei unverändert und gilt wieder, sobald sie den Server verlassen. Nur die Melk-Taste stellt jeder selbst ein. Das gilt auch, wenn jemand im Spiel einen Server hostet: dann zählt seine Config.
+
 ### Funktioniert es?
 
 - In `BepInEx/LogOutput.log` stehen Zeilen wie `Added DF_FeastPizza`.
@@ -132,13 +134,15 @@ In [r2modman](https://thunderstore.io/c/valheim/p/ebkr/r2modman/) oder [Gale](ht
 
 ## Konfiguration
 
-Nach dem ersten Start mit dem Mod liegt die Datei `BepInEx/config/felix.verlerleben.cfg` im Valheim-Ordner. Änderungen greifen nach einem Neustart des Spiels.
+Nach dem ersten Start mit dem Mod liegt die Datei `BepInEx/config/felix.verlerleben.cfg` im Valheim-Ordner. Auf einem Server gilt die Config des Servers (siehe [Dedicated Server](#dedicated-server)). Geänderte Werte wirken sofort, zum Beispiel über den Configuration Manager (F1).
+
+**Updates:** Werte, die noch auf dem Standard einer älteren Version stehen, werden nach einem Update einmal auf den neuen Standard gesetzt. Selbst geänderte Werte bleiben, die Config muss also nicht gelöscht werden.
 
 Die Abschnitte `[Teller]`, `[Pizza]` und `[Manta]` (die Feasts):
 
 | Schlüssel | Bedeutung |
 | --- | --- |
-| `Enabled` | Feast an- oder abschalten |
+| `Enabled` | Feast an- oder abschalten (aus: kein Rezept, nicht im Servierteller) |
 | `CraftingStation` | Wo das rohe Gericht zubereitet wird, Standard `FoodPreparationTable` |
 | `Ingredients` | Zutaten als `Prefab:Anzahl`, durch Kommas getrennt, z. B. `BreadDough:3,DF_Doener:6`. Unbekannte Namen landen als Warnung im Log |
 | `Amount` | Rohe Gerichte pro Herstellung |
@@ -152,7 +156,7 @@ Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `Craftin
 
 Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
 
-Der Abschnitt `[Cow]` schaltet die Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnBiome`, `SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkKey`, `MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
+Der Abschnitt `[Cow]` schaltet das Spawnen der Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnBiome`, `SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkKey`, `MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
 
 Die Prefab-Namen der Vanilla-Zutaten stehen in der [Jotunn-Itemliste](https://valheim-modding.github.io/Jotunn/data/objects/item-list.html).
 

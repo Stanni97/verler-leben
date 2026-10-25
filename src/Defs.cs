@@ -26,11 +26,11 @@ namespace VerlerLeben
         public void Bind(ConfigFile config)
         {
             string s = Key;
-            Enabled = config.Bind(s, "Enabled", Enabled, "Adds this ingredient to the game.").Value;
+            Enabled = config.Bind(s, "Enabled", Enabled, ServerSync.Desc("Can be crafted. Off: the recipe is gone.")).Value;
             CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
-                new ConfigDescription("Where the ingredient is crafted.", CraftingStations.GetAcceptableValueList())).Value;
-            Ingredients = config.Bind(s, "Ingredients", Ingredients, "Comma separated list of ItemPrefab:Amount.").Value;
-            Amount = config.Bind(s, "Amount", Amount, "Items produced per craft.").Value;
+                ServerSync.Desc("Where the ingredient is crafted.", CraftingStations.GetAcceptableValueList())).Value;
+            Ingredients = config.Bind(s, "Ingredients", Ingredients, ServerSync.Desc("Comma separated list of ItemPrefab:Amount.")).Value;
+            Amount = config.Bind(s, "Amount", Amount, ServerSync.Desc("Items produced per craft.")).Value;
         }
     }
 
@@ -62,17 +62,17 @@ namespace VerlerLeben
         public void Bind(ConfigFile config)
         {
             string s = Key;
-            Enabled = config.Bind(s, "Enabled", Enabled, "Adds this feast to the game.").Value;
+            Enabled = config.Bind(s, "Enabled", Enabled, ServerSync.Desc("Can be prepared and served. Off: the raw dish has no recipe and the feast is not in the Feaster.")).Value;
             CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
-                new ConfigDescription("Where the raw dish is prepared.", CraftingStations.GetAcceptableValueList())).Value;
-            Ingredients = config.Bind(s, "Ingredients", Ingredients, "Comma separated list of ItemPrefab:Amount for the raw dish.").Value;
-            Amount = config.Bind(s, "Amount", Amount, "Raw dishes produced per craft.").Value;
-            BakeSeconds = config.Bind(s, "BakeSeconds", BakeSeconds, "How long the raw dish bakes in the stone oven, in seconds.").Value;
-            Health = config.Bind(s, "Health", Health, "Health per serving.").Value;
-            Stamina = config.Bind(s, "Stamina", Stamina, "Stamina per serving.").Value;
-            Regen = config.Bind(s, "HealthRegen", Regen, "Health regeneration per tick while the food lasts.").Value;
-            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, "How long the food lasts after eating, in seconds.").Value;
-            Servings = config.Bind(s, "Servings", Servings, "How many times the feast can be eaten from before it is gone.").Value;
+                ServerSync.Desc("Where the raw dish is prepared.", CraftingStations.GetAcceptableValueList())).Value;
+            Ingredients = config.Bind(s, "Ingredients", Ingredients, ServerSync.Desc("Comma separated list of ItemPrefab:Amount for the raw dish.")).Value;
+            Amount = config.Bind(s, "Amount", Amount, ServerSync.Desc("Raw dishes produced per craft.")).Value;
+            BakeSeconds = config.Bind(s, "BakeSeconds", BakeSeconds, ServerSync.Desc("How long the raw dish bakes in the stone oven, in seconds.")).Value;
+            Health = config.Bind(s, "Health", Health, ServerSync.Desc("Health per serving.")).Value;
+            Stamina = config.Bind(s, "Stamina", Stamina, ServerSync.Desc("Stamina per serving.")).Value;
+            Regen = config.Bind(s, "HealthRegen", Regen, ServerSync.Desc("Health regeneration per tick while the food lasts.")).Value;
+            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, ServerSync.Desc("How long the food lasts after eating, in seconds.")).Value;
+            Servings = config.Bind(s, "Servings", Servings, ServerSync.Desc("How many times the feast can be eaten from before it is gone.")).Value;
         }
     }
 
@@ -115,26 +115,26 @@ namespace VerlerLeben
         public void Bind(ConfigFile config)
         {
             string s = Key;
-            Enabled = config.Bind(s, "Enabled", Enabled, "Adds the drink to the game.").Value;
+            Enabled = config.Bind(s, "Enabled", Enabled, ServerSync.Desc("Can be brewed. Off: the recipe is gone.")).Value;
             CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
-                new ConfigDescription("Where the drink is brewed.", CraftingStations.GetAcceptableValueList())).Value;
-            Ingredients = config.Bind(s, "Ingredients", Ingredients, "Comma separated list of ItemPrefab:Amount.").Value;
-            Amount = config.Bind(s, "Amount", Amount, "Bottles produced per craft.").Value;
-            Duration = config.Bind(s, "DurationSeconds", Duration, "How long the buff lasts, in seconds.").Value;
-            HealthRegenBonus = config.Bind(s, "HealthRegenBonusPercent", HealthRegenBonus, "Faster health regeneration, in percent.").Value;
-            StaminaRegenBonus = config.Bind(s, "StaminaRegenBonusPercent", StaminaRegenBonus, "Faster stamina regeneration, in percent.").Value;
+                ServerSync.Desc("Where the drink is brewed.", CraftingStations.GetAcceptableValueList())).Value;
+            Ingredients = config.Bind(s, "Ingredients", Ingredients, ServerSync.Desc("Comma separated list of ItemPrefab:Amount.")).Value;
+            Amount = config.Bind(s, "Amount", Amount, ServerSync.Desc("Bottles produced per craft.")).Value;
+            Duration = config.Bind(s, "DurationSeconds", Duration, ServerSync.Desc("How long the buff lasts, in seconds.")).Value;
+            HealthRegenBonus = config.Bind(s, "HealthRegenBonusPercent", HealthRegenBonus, ServerSync.Desc("Faster health regeneration, in percent.")).Value;
+            StaminaRegenBonus = config.Bind(s, "StaminaRegenBonusPercent", StaminaRegenBonus, ServerSync.Desc("Faster stamina regeneration, in percent.")).Value;
             FeastHealthRegenBonus = config.Bind(s, "FeastExtraHealthRegenPercent", FeastHealthRegenBonus,
-                "Extra health regeneration while a feast of this mod is active, on top of the base value, in percent.").Value;
+                ServerSync.Desc("Extra health regeneration while a feast of this mod is active, on top of the base value, in percent.")).Value;
             FeastStaminaRegenBonus = config.Bind(s, "FeastExtraStaminaRegenPercent", FeastStaminaRegenBonus,
-                "Extra stamina regeneration while a feast of this mod is active, in percent.").Value;
+                ServerSync.Desc("Extra stamina regeneration while a feast of this mod is active, in percent.")).Value;
             MeadHealthRegenBonus = config.Bind(s, "MeadExtraHealthRegenPercent", MeadHealthRegenBonus,
-                "Extra health regeneration while any mead is active, in percent.").Value;
+                ServerSync.Desc("Extra health regeneration while any mead is active, in percent.")).Value;
             MeadStaminaRegenBonus = config.Bind(s, "MeadExtraStaminaRegenPercent", MeadStaminaRegenBonus,
-                "Extra stamina regeneration while any mead is active, in percent.").Value;
+                ServerSync.Desc("Extra stamina regeneration while any mead is active, in percent.")).Value;
             BeerHealthRegenBonus = config.Bind(s, "BeerExtraHealthRegenPercent", BeerHealthRegenBonus,
-                "Extra health regeneration while barley wine, the beer of the game, is active, in percent.").Value;
+                ServerSync.Desc("Extra health regeneration while barley wine, the beer of the game, is active, in percent.")).Value;
             BeerStaminaRegenBonus = config.Bind(s, "BeerExtraStaminaRegenPercent", BeerStaminaRegenBonus,
-                "Extra stamina regeneration while barley wine is active, in percent.").Value;
+                ServerSync.Desc("Extra stamina regeneration while barley wine is active, in percent.")).Value;
         }
     }
 
@@ -160,16 +160,16 @@ namespace VerlerLeben
         public void Bind(ConfigFile config)
         {
             string s = Key;
-            Enabled = config.Bind(s, "Enabled", Enabled, "Adds this snack to the game.").Value;
+            Enabled = config.Bind(s, "Enabled", Enabled, ServerSync.Desc("Can be made. Off: the recipe is gone.")).Value;
             CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
-                new ConfigDescription("Where the snack is made.", CraftingStations.GetAcceptableValueList())).Value;
-            Ingredients = config.Bind(s, "Ingredients", Ingredients, "Comma separated list of ItemPrefab:Amount.").Value;
-            Amount = config.Bind(s, "Amount", Amount, "Snacks produced per craft.").Value;
-            Health = config.Bind(s, "Health", Health, "Health when eaten.").Value;
-            Stamina = config.Bind(s, "Stamina", Stamina, "Stamina when eaten.").Value;
-            Eitr = config.Bind(s, "Eitr", Eitr, "Eitr when eaten.").Value;
-            Regen = config.Bind(s, "HealthRegen", Regen, "Health regeneration per tick while the food lasts.").Value;
-            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, "How long the food lasts after eating, in seconds.").Value;
+                ServerSync.Desc("Where the snack is made.", CraftingStations.GetAcceptableValueList())).Value;
+            Ingredients = config.Bind(s, "Ingredients", Ingredients, ServerSync.Desc("Comma separated list of ItemPrefab:Amount.")).Value;
+            Amount = config.Bind(s, "Amount", Amount, ServerSync.Desc("Snacks produced per craft.")).Value;
+            Health = config.Bind(s, "Health", Health, ServerSync.Desc("Health when eaten.")).Value;
+            Stamina = config.Bind(s, "Stamina", Stamina, ServerSync.Desc("Stamina when eaten.")).Value;
+            Eitr = config.Bind(s, "Eitr", Eitr, ServerSync.Desc("Eitr when eaten.")).Value;
+            Regen = config.Bind(s, "HealthRegen", Regen, ServerSync.Desc("Health regeneration per tick while the food lasts.")).Value;
+            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, ServerSync.Desc("How long the food lasts after eating, in seconds.")).Value;
         }
     }
 }

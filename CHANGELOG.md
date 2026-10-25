@@ -1,7 +1,15 @@
 # Changelog
 
-## 1.3.1
+## 1.4.0
 
+- **Server-Config:** Auf einem Server mit dem Mod gelten seine Werte (Rezepte, Essen, Boonekamp, Kuh) für alle Spieler. Beim Betreten schickt der Server sie, beim Verlassen gelten wieder die eigenen. Ohne Server zählt wie bisher die eigene Config. Nur die Melk-Taste (`MilkKey`) bleibt immer die eigene.
+- Geänderte Werte wirken sofort, ohne Neustart: Rezepte, Werte der Gerichte und des Boonekamp, Backzeit, Portionen und die Kuh (Spawn, Zähmen, Wachsen, Größe neuer Kühe).
+- `Enabled = false` entfernt jetzt das Rezept (und das Feast aus dem Servierteller), statt den Gegenstand ganz aus dem Spiel zu nehmen. Bei der Kuh heißt es: Es spawnen keine neuen Kühe.
+- Die Config wird beim Update aufgeräumt: Werte, die noch einem alten Standardwert entsprechen (zum Beispiel das Dönerfleisch oder der Käse aus Loxfleisch), werden durch die aktuellen Rezepte und Werte ersetzt. Eigene Änderungen bleiben unverändert. Im Log steht, wie viele Werte ersetzt wurden. Die Config-Version steht unter `[General]` (`ConfigVersion`).
+
+## 1.3.1 (nicht veröffentlicht)
+
+- In 1.4.0 enthalten.
 - Die Config wird beim Update aufgeräumt: Werte, die noch einem alten Standardwert entsprechen (zum Beispiel das Dönerfleisch oder der Käse aus Loxfleisch), werden durch die aktuellen Rezepte und Werte ersetzt. Eigene Änderungen bleiben unverändert. Im Log steht, wie viele Werte ersetzt wurden. Die Config-Version steht unter `[General]` (`ConfigVersion`).
 
 ## 1.3.0

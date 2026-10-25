@@ -16,12 +16,14 @@ namespace VerlerLeben
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(Jotunn.Main.ModGuid)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
+    // On a server with this mod its gameplay values apply to everyone; without a server each player's own config counts.
+    [SynchronizationMode(AdminOnlyStrictness.IfOnServer)]
     internal class VerlerLebenPlugin : BaseUnityPlugin
     {
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.3.1";
+        public const string PluginVersion = "1.4.0";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -91,10 +93,33 @@ namespace VerlerLeben
             },
         };
 
+        // What was added, so changed values (e.g. from the server) can be applied in place.
+        private readonly Dictionary<string, CustomItem> _items = new Dictionary<string, CustomItem>();
+        private readonly Dictionary<string, GameObject> _feasts = new Dictionary<string, GameObject>();
+        private SE_Boonekamp _boonekampEffect;
+        private bool _added;
+        private bool _dirty;
+
         private void Awake()
         {
+            ServerSync.Log = Logger;
             int storedConfigVersion = ConfigMigration.ReadStoredVersion(Config);
+            BindAll();
 
+            SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza", "$item_df_manta" });
+            new Harmony(PluginGUID).PatchAll(typeof(VerlerLebenPlugin).Assembly);
+
+            ConfigMigration.Apply(Config, storedConfigVersion, Logger);
+
+            AddLocalizations();
+            PrefabManager.OnVanillaPrefabsAvailable += AddContent;
+
+            // Fires for every value the server sends, when it restores the own values on leaving, and on a config reload.
+            Config.SettingChanged += (sender, args) => _dirty = true;
+        }
+
+        private void BindAll()
+        {
             foreach (Ingredient ingredient in _ingredients)
             {
                 ingredient.Bind(Config);
@@ -112,14 +137,78 @@ namespace VerlerLeben
 
             _cow.Bind(Config);
             _boonekamp.Bind(Config);
+        }
 
-            SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza", "$item_df_manta" });
-            new Harmony(PluginGUID).PatchAll(typeof(VerlerLebenPlugin).Assembly);
+        private void Update()
+        {
+            if (_dirty && _added)
+            {
+                _dirty = false;
+                try
+                {
+                    Refresh();
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Could not apply the changed config: {e}");
+                }
+            }
+        }
 
-            ConfigMigration.Apply(Config, storedConfigVersion, Logger);
+        /// <summary>Reads the config again and updates recipes, food, the drink, the feasts and the cow.</summary>
+        private void Refresh()
+        {
+            BindAll();
 
-            AddLocalizations();
-            PrefabManager.OnVanillaPrefabsAvailable += AddContent;
+            foreach (Ingredient ingredient in _ingredients)
+            {
+                ServerSync.SetRecipe(RecipeOf(ingredient.PrefabName), ingredient.Enabled, ingredient.CraftingStation,
+                    ingredient.Amount, ingredient.Ingredients);
+            }
+
+            foreach (Snack snack in _snacks)
+            {
+                ServerSync.SetRecipe(RecipeOf(snack.PrefabName), snack.Enabled, snack.CraftingStation, snack.Amount, snack.Ingredients);
+                if (_items.TryGetValue(snack.PrefabName, out CustomItem item))
+                {
+                    SetSnackFood(item.ItemDrop.m_itemData.m_shared, snack);
+                }
+            }
+
+            ServerSync.SetRecipe(RecipeOf(_boonekamp.PrefabName), _boonekamp.Enabled, _boonekamp.CraftingStation,
+                _boonekamp.Amount, _boonekamp.Ingredients);
+            if (_boonekampEffect != null)
+            {
+                SetDrinkEffect(_boonekampEffect, _boonekamp);
+            }
+
+            CookingStation oven = PrefabManager.Instance.GetPrefab("piece_oven")?.GetComponent<CookingStation>();
+            foreach (Dish dish in _dishes)
+            {
+                ServerSync.SetRecipe(RecipeOf(dish.RawPrefab), dish.Enabled, dish.CraftingStation, dish.Amount, dish.Ingredients);
+                if (_feasts.TryGetValue(dish.Key, out GameObject feast))
+                {
+                    SetFeast(feast, dish);
+                }
+
+                CookingStation.ItemConversion bake = oven?.m_conversion.Find(c => c.m_from != null && c.m_from.name == dish.RawPrefab);
+                if (bake != null)
+                {
+                    bake.m_cookTime = Mathf.Max(1f, dish.BakeSeconds);
+                }
+
+                ServerSync.SetWord($"item_{dish.Token}_desc", DishDescription(dish, ServerSync.German));
+            }
+
+            Cows.Apply(_cow);
+        }
+
+        private Recipe RecipeOf(string prefab) => _items.TryGetValue(prefab, out CustomItem item) ? item.Recipe?.Recipe : null;
+
+        private void Track(CustomItem item, string station, string ingredients)
+        {
+            _items[item.ItemPrefab.name] = item;
+            ServerSync.Remember(item.Recipe?.Recipe, station, ingredients);
         }
 
         private Dish Get(string key) => _dishes.First(d => d.Key == key);
@@ -157,17 +246,17 @@ namespace VerlerLeben
                 { "item_df_teller_raw", "Kaunitzer Plate (raw)" },
                 { "item_df_teller_raw_desc", "Döner and fries in an aluminium tray, covered in cheese. Needs to be baked in the stone oven." },
                 { "item_df_teller", "Kaunitzer Plate" },
-                { "item_df_teller_desc", $"Döner with fries, baked under a thick layer of cheese until the edges are almost black. Lots of health and some stamina for {Minutes(teller)} minutes." },
+                { "item_df_teller_desc", DishDescription(teller, false) },
 
                 { "item_df_pizza_raw", "Spexarder Pizza (raw)" },
                 { "item_df_pizza_raw_desc", "Pizza dough with sauce, cheese and a mountain of Döner meat. Needs to be baked in the stone oven." },
                 { "item_df_pizza", "Spexarder Pizza" },
-                { "item_df_pizza_desc", $"Greasy, hearty and very filling. Plenty of Döner meat under golden cheese. Health and stamina for {Minutes(pizza)} minutes." },
+                { "item_df_pizza_desc", DishDescription(pizza, false) },
 
                 { "item_df_manta_raw", "Mantaplatte (raw)" },
                 { "item_df_manta_raw_desc", "Currywurst and fries with mayo on one big plate. Needs to be baked in the stone oven." },
                 { "item_df_manta", "Mantaplatte" },
-                { "item_df_manta_desc", $"The classic from the snack bar: Currywurst and fries with mayo. Health and stamina for {Minutes(manta)} minutes." },
+                { "item_df_manta_desc", DishDescription(manta, false) },
 
                 { "item_df_entenbox", "Duck Box" },
                 { "item_df_entenbox_desc", "Fried dough balls with cinnamon sugar and strawberry sauce from the Kirmes, in the yellow box with the duck face. A little Eitr for a short time." },
@@ -201,17 +290,17 @@ namespace VerlerLeben
                 { "item_df_teller_raw", "Kaunitzer Teller (roh)" },
                 { "item_df_teller_raw_desc", "Döner und Pommes in der Aluschale, dick mit Käse bedeckt. Muss im Steinofen gebacken werden." },
                 { "item_df_teller", "Kaunitzer Teller" },
-                { "item_df_teller_desc", $"Döner mit Pommes, unter einer dicken Käseschicht überbacken, bis die Ränder fast schwarz sind. Viel Leben und etwas Ausdauer für {Minutes(teller)} Minuten." },
+                { "item_df_teller_desc", DishDescription(teller, true) },
 
                 { "item_df_pizza_raw", "Spexarder Pizza (roh)" },
                 { "item_df_pizza_raw_desc", "Pizzateig mit Soße, Käse und einem Berg Dönerfleisch. Muss im Steinofen gebacken werden." },
                 { "item_df_pizza", "Spexarder Pizza" },
-                { "item_df_pizza_desc", $"Deftig, fettig und sehr sättigend. Ordentlich Dönerfleisch unter goldenem Käse. Leben und Ausdauer für {Minutes(pizza)} Minuten." },
+                { "item_df_pizza_desc", DishDescription(pizza, true) },
 
                 { "item_df_manta_raw", "Mantaplatte (roh)" },
                 { "item_df_manta_raw_desc", "Currywurst und Pommes mit Mayo auf einer großen Platte. Muss im Steinofen gebacken werden." },
                 { "item_df_manta", "Mantaplatte" },
-                { "item_df_manta_desc", $"Der Klassiker von der Imbissbude: Currywurst und Pommes mit Mayo. Leben und Ausdauer für {Minutes(manta)} Minuten." },
+                { "item_df_manta_desc", DishDescription(manta, true) },
 
                 { "item_df_entenbox", "Entenbox" },
                 { "item_df_entenbox_desc", "Frittierte Teigbällchen mit Zimtzucker und Erdbeersoße von der Kirmes, in der gelben Box mit dem Entengesicht. Ein bisschen Eitr für kurze Zeit." },
@@ -220,11 +309,33 @@ namespace VerlerLeben
 
         private static string Minutes(Dish dish) => Mathf.Max(1, Mathf.RoundToInt(dish.BurnSeconds / 60f)).ToString();
 
+        /// <summary>The feast descriptions name the duration, so they are rebuilt when it changes.</summary>
+        private static string DishDescription(Dish dish, bool german)
+        {
+            string m = Minutes(dish);
+            switch (dish.Key)
+            {
+                case "Teller":
+                    return german
+                        ? $"Döner mit Pommes, unter einer dicken Käseschicht überbacken, bis die Ränder fast schwarz sind. Viel Leben und etwas Ausdauer für {m} Minuten."
+                        : $"Döner with fries, baked under a thick layer of cheese until the edges are almost black. Lots of health and some stamina for {m} minutes.";
+                case "Pizza":
+                    return german
+                        ? $"Deftig, fettig und sehr sättigend. Ordentlich Dönerfleisch unter goldenem Käse. Leben und Ausdauer für {m} Minuten."
+                        : $"Greasy, hearty and very filling. Plenty of Döner meat under golden cheese. Health and stamina for {m} minutes.";
+                default:
+                    return german
+                        ? $"Der Klassiker von der Imbissbude: Currywurst und Pommes mit Mayo. Leben und Ausdauer für {m} Minuten."
+                        : $"The classic from the snack bar: Currywurst and fries with mayo. Health and stamina for {m} minutes.";
+            }
+        }
+
         private void AddContent()
         {
             PrefabManager.OnVanillaPrefabsAvailable -= AddContent;
 
-            foreach (Ingredient ingredient in _ingredients.Where(i => i.Enabled))
+            // Everything is added; Enabled only switches recipes and spawns, so the server can change it while you play.
+            foreach (Ingredient ingredient in _ingredients)
             {
                 try
                 {
@@ -236,36 +347,30 @@ namespace VerlerLeben
                 }
             }
 
-            if (_cow.Enabled)
+            try
             {
-                try
+                foreach (DropItem drop in _drops)
                 {
-                    foreach (DropItem drop in _drops)
-                    {
-                        AddDropItem(drop);
-                    }
+                    AddDropItem(drop);
+                }
 
-                    Cows.Add(_cow, Logger);
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError($"Failed to add the cow: {e}");
-                }
+                Cows.Add(_cow, Logger);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Failed to add the cow: {e}");
             }
 
-            if (_boonekamp.Enabled)
+            try
             {
-                try
-                {
-                    AddDrink(_boonekamp);
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError($"Failed to add {_boonekamp.PrefabName}: {e}");
-                }
+                AddDrink(_boonekamp);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Failed to add {_boonekamp.PrefabName}: {e}");
             }
 
-            foreach (Snack snack in _snacks.Where(n => n.Enabled))
+            foreach (Snack snack in _snacks)
             {
                 try
                 {
@@ -277,7 +382,7 @@ namespace VerlerLeben
                 }
             }
 
-            foreach (Dish dish in _dishes.Where(d => d.Enabled))
+            foreach (Dish dish in _dishes)
             {
                 try
                 {
@@ -288,6 +393,9 @@ namespace VerlerLeben
                     Logger.LogError($"Failed to add {dish.FeastPrefab}: {e}");
                 }
             }
+
+            _added = true;
+            _dirty = true;   // applies Enabled and everything else on the next frame
         }
 
         private void AddDropItem(DropItem drop)
@@ -315,19 +423,12 @@ namespace VerlerLeben
             effect.m_tooltip = $"$se_{drink.Token}_tooltip";
             effect.m_category = "df_boonekamp";   // its own category, so it stacks with the meads
             effect.m_icon = icon;
-            effect.m_ttl = drink.Duration;
             effect.m_startMessageType = MessageHud.MessageType.Center;
             effect.m_startMessage = $"$se_{drink.Token}_start";
             effect.m_stopMessageType = MessageHud.MessageType.TopLeft;
             effect.m_stopMessage = $"$se_{drink.Token}_stop";
-            effect.m_healthRegenMultiplier = 1f + drink.HealthRegenBonus / 100f;
-            effect.m_staminaRegenMultiplier = 1f + drink.StaminaRegenBonus / 100f;
-            effect.FeastHealth = drink.FeastHealthRegenBonus / 100f;
-            effect.FeastStamina = drink.FeastStaminaRegenBonus / 100f;
-            effect.MeadHealth = drink.MeadHealthRegenBonus / 100f;
-            effect.MeadStamina = drink.MeadStaminaRegenBonus / 100f;
-            effect.BeerHealth = drink.BeerHealthRegenBonus / 100f;
-            effect.BeerStamina = drink.BeerStaminaRegenBonus / 100f;
+            SetDrinkEffect(effect, drink);
+            _boonekampEffect = effect;
             if (baseEffect != null)
             {
                 effect.m_startEffects = baseEffect.m_startEffects;
@@ -351,6 +452,42 @@ namespace VerlerLeben
             item.ItemDrop.m_itemData.m_shared.m_consumeStatusEffect = effect;
             item.ItemPrefab.transform.localScale *= 0.85f;
             ItemManager.Instance.AddItem(item);
+            Track(item, drink.CraftingStation, drink.Ingredients);
+        }
+
+        /// <summary>SEMan copies the effect when it starts, so a changed value counts from the next drink.</summary>
+        private static void SetDrinkEffect(SE_Boonekamp effect, Drink drink)
+        {
+            effect.m_ttl = drink.Duration;
+            effect.m_healthRegenMultiplier = 1f + drink.HealthRegenBonus / 100f;
+            effect.m_staminaRegenMultiplier = 1f + drink.StaminaRegenBonus / 100f;
+            effect.FeastHealth = drink.FeastHealthRegenBonus / 100f;
+            effect.FeastStamina = drink.FeastStaminaRegenBonus / 100f;
+            effect.MeadHealth = drink.MeadHealthRegenBonus / 100f;
+            effect.MeadStamina = drink.MeadStaminaRegenBonus / 100f;
+            effect.BeerHealth = drink.BeerHealthRegenBonus / 100f;
+            effect.BeerStamina = drink.BeerStaminaRegenBonus / 100f;
+        }
+
+        private static void SetSnackFood(ItemDrop.ItemData.SharedData shared, Snack snack)
+        {
+            shared.m_food = snack.Health;
+            shared.m_foodStamina = snack.Stamina;
+            shared.m_foodEitr = snack.Eitr;
+            shared.m_foodRegen = snack.Regen;
+            shared.m_foodBurnTime = snack.BurnSeconds;
+        }
+
+        private static void SetFeast(GameObject feast, Dish dish)
+        {
+            feast.GetComponent<Piece>().m_enabled = dish.Enabled;
+            ItemDrop.ItemData.SharedData food = feast.GetComponent<ItemDrop>().m_itemData.m_shared;
+            food.m_food = dish.Health;
+            food.m_foodStamina = dish.Stamina;
+            food.m_foodEitr = 0f;
+            food.m_foodRegen = dish.Regen;
+            food.m_foodBurnTime = dish.BurnSeconds;
+            feast.GetComponent<Feast>().m_eatStacks = Mathf.Max(1, dish.Servings);
         }
 
         private void AddSnack(Snack snack)
@@ -368,13 +505,9 @@ namespace VerlerLeben
             };
 
             var item = new CustomItem(snack.PrefabName, snack.BasePrefab, config);
-            ItemDrop.ItemData.SharedData shared = item.ItemDrop.m_itemData.m_shared;
-            shared.m_food = snack.Health;
-            shared.m_foodStamina = snack.Stamina;
-            shared.m_foodEitr = snack.Eitr;
-            shared.m_foodRegen = snack.Regen;
-            shared.m_foodBurnTime = snack.BurnSeconds;
+            SetSnackFood(item.ItemDrop.m_itemData.m_shared, snack);
             ItemManager.Instance.AddItem(item);
+            Track(item, snack.CraftingStation, snack.Ingredients);
         }
 
         private void AddIngredient(Ingredient ingredient)
@@ -394,6 +527,7 @@ namespace VerlerLeben
             var item = new CustomItem(ingredient.PrefabName, ingredient.BasePrefab, config);
             MakePlainMaterial(item.ItemDrop);
             ItemManager.Instance.AddItem(item);
+            Track(item, ingredient.CraftingStation, ingredient.Ingredients);
         }
 
         private void AddDish(Dish dish)
@@ -417,6 +551,7 @@ namespace VerlerLeben
             var raw = new CustomItem(dish.RawPrefab, dish.BaseRaw, rawConfig);
             MakePlainMaterial(raw.ItemDrop);
             ItemManager.Instance.AddItem(raw);
+            Track(raw, dish.CraftingStation, dish.Ingredients);
 
             // 2. Baked dish, the item the Feaster tool consumes to put the feast on the table.
             var baked = new CustomItem(dish.MaterialPrefab, dish.BaseMaterial);
@@ -445,13 +580,8 @@ namespace VerlerLeben
             food.m_name = name;
             food.m_description = description;
             food.m_icons = new[] { icon };
-            food.m_food = dish.Health;
-            food.m_foodStamina = dish.Stamina;
-            food.m_foodEitr = 0f;
-            food.m_foodRegen = dish.Regen;
-            food.m_foodBurnTime = dish.BurnSeconds;
-
-            feast.GetComponent<Feast>().m_eatStacks = Mathf.Max(1, dish.Servings);
+            SetFeast(feast, dish);
+            _feasts[dish.Key] = feast;
 
             // The food is saved by prefab name, so it has to be in the ObjectDB like the vanilla feasts.
             ItemManager.Instance.AddItem(new CustomItem(feast, false));
