@@ -55,7 +55,7 @@ In den **Ebenen** laufen jetzt Kühe herum, dort wachsen auch Gerste und Flachs,
 3. **Backen** im Steinofen (Stone Oven), 60 Sekunden. Heraus kommt das fertige Gericht.
 4. Mit dem **Servierteller** auf den Tisch stellen und gemeinsam essen.
 
-Das Berg-Gewürz gibt es nicht zu farmen, es kommt wie bei den Feasts aus dem Hauptspiel von der Sumpfhexe. Alle Rezepte, Stationen, Werte und Backzeiten lassen sich in der Config ändern (siehe [Konfiguration](#konfiguration)).
+Das Berg-Gewürz gibt es nicht zu farmen, es kommt wie bei den Feasts aus dem Hauptspiel von der Sumpfhexe. Alte Standardwerte in der Config ersetzt die Mod beim Update selbst, eigene Änderungen bleiben. Alle Rezepte, Stationen, Werte und Backzeiten lassen sich in der Config ändern (siehe [Konfiguration](#konfiguration)).
 
 ## Die Entenbox
 

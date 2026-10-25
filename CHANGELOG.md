@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Die Config wird beim Update aufgeräumt: Werte, die noch einem alten Standardwert entsprechen (zum Beispiel das Dönerfleisch oder der Käse aus Loxfleisch), werden durch die aktuellen Rezepte und Werte ersetzt. Eigene Änderungen bleiben unverändert. Im Log steht, wie viele Werte ersetzt wurden. Die Config-Version steht unter `[General]` (`ConfigVersion`).
+
 ## 1.3.0
 
 - Neues Feast **Mantaplatte** (Currywurst und Pommes mit Mayo): 85 Leben, 65 Ausdauer, 65 Minuten. Roh am Zubereitungstisch aus 6 Würsten, 4 Karotten, 3 Himbeeren, 2 Eiern und 1 Berg-Gewürz, dann im Steinofen backen. Zählt auch für den Feast-Bonus des Boonekamp.

@@ -21,7 +21,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.3.0";
+        public const string PluginVersion = "1.3.1";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -93,6 +93,8 @@ namespace VerlerLeben
 
         private void Awake()
         {
+            int storedConfigVersion = ConfigMigration.ReadStoredVersion(Config);
+
             foreach (Ingredient ingredient in _ingredients)
             {
                 ingredient.Bind(Config);
@@ -113,6 +115,8 @@ namespace VerlerLeben
 
             SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza", "$item_df_manta" });
             new Harmony(PluginGUID).PatchAll(typeof(VerlerLebenPlugin).Assembly);
+
+            ConfigMigration.Apply(Config, storedConfigVersion, Logger);
 
             AddLocalizations();
             PrefabManager.OnVanillaPrefabsAvailable += AddContent;
