@@ -1,5 +1,9 @@
 # Changelog
 
+## Unveröffentlicht
+
+- README: Der Bifrost Updater wird nicht mehr erwähnt. Updates laufen über den Mod-Manager oder die Release-Seite.
+
 ## 1.4.0
 
 - **Server-Config:** Auf einem Server mit dem Mod gelten seine Werte (Rezepte, Essen, Boonekamp, Kuh) für alle Spieler. Beim Betreten schickt der Server sie, beim Verlassen gelten wieder die eigenen. Ohne Server zählt wie bisher die eigene Config. Nur die Melk-Taste (`MilkKey`) bleibt immer die eigene.
