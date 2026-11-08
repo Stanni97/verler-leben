@@ -23,7 +23,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.4.0";
+        public const string PluginVersion = "1.4.1";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -610,6 +610,8 @@ namespace VerlerLeben
             shared.m_foodRegen = 0f;
             shared.m_foodBurnTime = 0f;
             shared.m_consumeStatusEffect = null;
+            // Raw meat and dough point to their cooked version, whose food values the game adds to the tooltip.
+            shared.m_appendToolTip = null;
         }
 
         private RequirementConfig[] ParseRequirements(string owner, string ingredients)
