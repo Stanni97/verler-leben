@@ -35,19 +35,25 @@ namespace VerlerLeben
                 Key = "Doener", PrefabName = "DF_Doener", BasePrefab = "LoxMeat",
                 // Beef of the cow, a little lox from the Plains and the Mountains spice.
                 Ingredients = "DF_Rindfleisch:1,CookedLoxMeat:1,SpiceMountains:1", Amount = 3,
+                Health = 45f, Stamina = 25f, Regen = 3f, BurnSeconds = 1500f,
             },
             new Ingredient
             {
                 Key = "Kaese", PrefabName = "DF_Kaese", BasePrefab = "BreadDough",
                 // Milk of the cow.
                 Ingredients = "DF_Milch:2", Amount = 3,
+                Health = 25f, Stamina = 25f, Regen = 2f, BurnSeconds = 1200f,
             },
         };
 
         // Dropped by the cow or made from her: milk and beef.
         private readonly DropItem[] _drops =
         {
-            new DropItem { Key = "Milch", PrefabName = "DF_Milch", BasePrefab = "MeadStaminaMinor", Weight = 0.5f, StackSize = 20 },
+            new DropItem
+            {
+                Key = "Milch", PrefabName = "DF_Milch", BasePrefab = "MeadStaminaMinor", Weight = 0.5f, StackSize = 20,
+                Health = 12f, Stamina = 30f, Regen = 1f, BurnSeconds = 600f,
+            },
             new DropItem { Key = "Rindfleisch", PrefabName = "DF_Rindfleisch", BasePrefab = "LoxMeat", Weight = 0.5f, StackSize = 30 },
         };
 
@@ -135,6 +141,11 @@ namespace VerlerLeben
                 snack.Bind(Config);
             }
 
+            foreach (DropItem drop in _drops)
+            {
+                drop.Bind(Config);
+            }
+
             _cow.Bind(Config);
             _boonekamp.Bind(Config);
         }
@@ -164,6 +175,18 @@ namespace VerlerLeben
             {
                 ServerSync.SetRecipe(RecipeOf(ingredient.PrefabName), ingredient.Enabled, ingredient.CraftingStation,
                     ingredient.Amount, ingredient.Ingredients);
+                if (_items.TryGetValue(ingredient.PrefabName, out CustomItem food))
+                {
+                    SetFood(food.ItemDrop.m_itemData.m_shared, ingredient.Health, ingredient.Stamina, ingredient.Regen, ingredient.BurnSeconds);
+                }
+            }
+
+            foreach (DropItem drop in _drops)
+            {
+                if (_items.TryGetValue(drop.PrefabName, out CustomItem food))
+                {
+                    SetFood(food.ItemDrop.m_itemData.m_shared, drop.Health, drop.Stamina, drop.Regen, drop.BurnSeconds);
+                }
             }
 
             foreach (Snack snack in _snacks)
@@ -221,7 +244,7 @@ namespace VerlerLeben
             loc.AddTranslation("English", new Dictionary<string, string>
             {
                 { "item_df_milch", "Milk" },
-                { "item_df_milch_desc", "Fresh from the cow. Becomes cheese at the preparation table." },
+                { "item_df_milch_desc", "Fresh from the cow. Can be drunk, or becomes cheese at the preparation table." },
                 { "item_df_rindfleisch", "Beef" },
                 { "item_df_rindfleisch_desc", "Raw beef from a cow. The base of Döner meat." },
                 { "df_kuh", "Cow" },
@@ -239,9 +262,9 @@ namespace VerlerLeben
                 { "se_df_boonekamp_start", "Prost!" },
                 { "se_df_boonekamp_stop", "The warmth fades." },
                 { "item_df_doener", "Döner Meat" },
-                { "item_df_doener_desc", "Thin slices of beef and lox meat from the spit. The base of every good feast." },
+                { "item_df_doener_desc", "Thin slices of beef and lox meat from the spit. Tastes good on its own and is the base of every good feast." },
                 { "item_df_kaese", "Cheese" },
-                { "item_df_kaese_desc", "Barley cheese, made from barley milk like the oat milk of the north. Melts beautifully." },
+                { "item_df_kaese_desc", "Cheese from the milk of the cow. A small snack, and it melts beautifully on a feast." },
 
                 { "item_df_teller_raw", "Kaunitzer Plate (raw)" },
                 { "item_df_teller_raw_desc", "Döner and fries in an aluminium tray, covered in cheese. Needs to be baked in the stone oven." },
@@ -265,7 +288,7 @@ namespace VerlerLeben
             loc.AddTranslation("German", new Dictionary<string, string>
             {
                 { "item_df_milch", "Milch" },
-                { "item_df_milch_desc", "Frisch von der Kuh. Wird am Zubereitungstisch zu Käse." },
+                { "item_df_milch_desc", "Frisch von der Kuh. Kann getrunken werden oder wird am Zubereitungstisch zu Käse." },
                 { "item_df_rindfleisch", "Rindfleisch" },
                 { "item_df_rindfleisch_desc", "Rohes Rindfleisch von der Kuh. Die Grundlage fürs Dönerfleisch." },
                 { "df_kuh", "Kuh" },
@@ -283,9 +306,9 @@ namespace VerlerLeben
                 { "se_df_boonekamp_start", "Prost!" },
                 { "se_df_boonekamp_stop", "Die Wärme lässt nach." },
                 { "item_df_doener", "Dönerfleisch" },
-                { "item_df_doener_desc", "Dünne Scheiben Rind- und Loxfleisch vom Spieß. Die Grundlage jedes guten Festmahls." },
+                { "item_df_doener_desc", "Dünne Scheiben Rind- und Loxfleisch vom Spieß. Schmeckt auch pur und ist die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
-                { "item_df_kaese_desc", "Gerstenkäse aus Gerstenmilch, so wie die Hafermilch im Norden. Schmilzt wunderbar." },
+                { "item_df_kaese_desc", "Käse aus der Milch der Kuh. Ein kleiner Snack, und er schmilzt wunderbar auf jedem Festmahl." },
 
                 { "item_df_teller_raw", "Kaunitzer Teller (roh)" },
                 { "item_df_teller_raw_desc", "Döner und Pommes in der Aluschale, dick mit Käse bedeckt. Muss im Steinofen gebacken werden." },
@@ -408,7 +431,9 @@ namespace VerlerLeben
             shared.m_weight = drop.Weight;
             shared.m_maxStackSize = drop.StackSize;
             MakePlainMaterial(item.ItemDrop);
+            SetFood(shared, drop.Health, drop.Stamina, drop.Regen, drop.BurnSeconds);
             ItemManager.Instance.AddItem(item);
+            _items[drop.PrefabName] = item;
         }
 
         private void AddDrink(Drink drink)
@@ -526,6 +551,7 @@ namespace VerlerLeben
 
             var item = new CustomItem(ingredient.PrefabName, ingredient.BasePrefab, config);
             MakePlainMaterial(item.ItemDrop);
+            SetFood(item.ItemDrop.m_itemData.m_shared, ingredient.Health, ingredient.Stamina, ingredient.Regen, ingredient.BurnSeconds);
             ItemManager.Instance.AddItem(item);
             Track(item, ingredient.CraftingStation, ingredient.Ingredients);
         }
@@ -601,6 +627,18 @@ namespace VerlerLeben
             }));
 
             Logger.LogInfo($"Added {dish.FeastPrefab} (model of {dish.BaseFeast}).");
+        }
+
+        /// <summary>Food values for an ingredient that can also be eaten; 0 health and stamina leave it a plain material.</summary>
+        private static void SetFood(ItemDrop.ItemData.SharedData shared, float health, float stamina, float regen, float seconds)
+        {
+            bool edible = health > 0f || stamina > 0f;
+            shared.m_itemType = edible ? ItemDrop.ItemData.ItemType.Consumable : ItemDrop.ItemData.ItemType.Material;
+            shared.m_food = health;
+            shared.m_foodStamina = stamina;
+            shared.m_foodEitr = 0f;
+            shared.m_foodRegen = regen;
+            shared.m_foodBurnTime = edible ? seconds : 0f;
         }
 
         /// <summary>Some base items are food; the clone must only be an ingredient.</summary>

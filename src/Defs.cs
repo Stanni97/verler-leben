@@ -20,6 +20,10 @@ namespace VerlerLeben
         public string Ingredients = "";
         public int Amount = 1;
 
+        // Eaten on its own, too. Health and Stamina at 0 make it a plain ingredient.
+        public float Health, Stamina, Regen;
+        public float BurnSeconds = 1200f;
+
         public string Token => "df_" + Key.ToLowerInvariant();
         public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
 
@@ -27,6 +31,10 @@ namespace VerlerLeben
         {
             string s = Key;
             Enabled = config.Bind(s, "Enabled", Enabled, ServerSync.Desc("Can be crafted. Off: the recipe is gone.")).Value;
+            Health = config.Bind(s, "Health", Health, ServerSync.Desc("Health when eaten on its own. 0 together with Stamina 0: not edible.")).Value;
+            Stamina = config.Bind(s, "Stamina", Stamina, ServerSync.Desc("Stamina when eaten on its own.")).Value;
+            Regen = config.Bind(s, "HealthRegen", Regen, ServerSync.Desc("Health regeneration per tick while the food lasts.")).Value;
+            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, ServerSync.Desc("How long the food lasts after eating, in seconds.")).Value;
             CraftingStation = config.Bind(s, "CraftingStation", CraftingStation,
                 ServerSync.Desc("Where the ingredient is crafted.", CraftingStations.GetAcceptableValueList())).Value;
             Ingredients = config.Bind(s, "Ingredients", Ingredients, ServerSync.Desc("Comma separated list of ItemPrefab:Amount.")).Value;
@@ -85,8 +93,26 @@ namespace VerlerLeben
         public float Weight = 0.5f;
         public int StackSize = 30;
 
+        // Edible when Health or Stamina is above 0 (set in the definition, configurable).
+        public float Health, Stamina, Regen;
+        public float BurnSeconds = 600f;
+
         public string Token => "df_" + Key.ToLowerInvariant();
         public string IconResource => $"VerlerLeben.{Key.ToLowerInvariant()}.png";
+
+        public void Bind(ConfigFile config)
+        {
+            if (Health <= 0f && Stamina <= 0f)
+            {
+                return;
+            }
+
+            string s = Key;
+            Health = config.Bind(s, "Health", Health, ServerSync.Desc("Health when eaten on its own. 0 together with Stamina 0: not edible.")).Value;
+            Stamina = config.Bind(s, "Stamina", Stamina, ServerSync.Desc("Stamina when eaten on its own.")).Value;
+            Regen = config.Bind(s, "HealthRegen", Regen, ServerSync.Desc("Health regeneration per tick while the food lasts.")).Value;
+            BurnSeconds = config.Bind(s, "DurationSeconds", BurnSeconds, ServerSync.Desc("How long the food lasts after eating, in seconds.")).Value;
+        }
     }
 
     /// <summary>Schroeders Boonekamp, a drink with a regeneration buff that is stronger after a feast.</summary>

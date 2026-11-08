@@ -152,7 +152,7 @@ Die Abschnitte `[Teller]`, `[Pizza]` und `[Manta]` (die Feasts):
 | `DurationSeconds` | Wie lange das Essen wirkt |
 | `Servings` | Portionen pro Feast |
 
-Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`.
+Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`. Beide sind auch einzeln essbar (`Health`, `Stamina`, `HealthRegen`, `DurationSeconds`; Leben und Ausdauer auf 0 macht sie wieder ungenießbar). Dasselbe gilt für die Milch im Abschnitt `[Milch]`. Rindfleisch ist roh und nicht essbar.
 
 Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
 
