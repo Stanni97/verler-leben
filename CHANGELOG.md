@@ -3,6 +3,7 @@
 ## 1.4.1
 
 - Dönerfleisch, Käse, die rohen Gerichte, Milch und Rindfleisch zeigen am Tisch keine Essenswerte mehr an. Sie erbten von Loxfleisch und Teig den Verweis auf das gekochte Gegenstück, dessen Werte der Tooltip anzeigte. Sie sind reine Zutaten und nicht essbar.
+- Die rohen und gebackenen Gerichte zeigen jetzt die Werte des fertigen Feasts an (Leben, Ausdauer, Regeneration, Dauer, auch vom Server), statt der Werte der Vanilla-Pastete.
 - README: Der Bifrost Updater wird nicht mehr erwähnt. Updates laufen über den Mod-Manager oder die Release-Seite.
 
 ## 1.4.0

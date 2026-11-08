@@ -583,6 +583,10 @@ namespace VerlerLeben
             SetFeast(feast, dish);
             _feasts[dish.Key] = feast;
 
+            // The raw and the baked dish show what the feast gives (it follows the config), not the values of the vanilla dish.
+            raw.ItemDrop.m_itemData.m_shared.m_appendToolTip = feast.GetComponent<ItemDrop>();
+            bakedShared.m_appendToolTip = feast.GetComponent<ItemDrop>();
+
             // The food is saved by prefab name, so it has to be in the ObjectDB like the vanilla feasts.
             ItemManager.Instance.AddItem(new CustomItem(feast, false));
             PieceManager.Instance.AddPiece(new CustomPiece(feast, FeasterTable, false));
