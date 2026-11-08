@@ -42,7 +42,7 @@ namespace VerlerLeben
                 Key = "Kaese", PrefabName = "DF_Kaese", BasePrefab = "BreadDough",
                 // Milk of the cow.
                 Ingredients = "DF_Milch:2", Amount = 3,
-                Health = 25f, Stamina = 25f, Regen = 2f, BurnSeconds = 1200f,
+                Health = 30f, Stamina = 40f, Regen = 2f, BurnSeconds = 1200f,
             },
         };
 

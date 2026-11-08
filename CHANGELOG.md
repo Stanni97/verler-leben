@@ -2,7 +2,7 @@
 
 ## 1.4.1
 
-- **Essbar:** Dönerfleisch (45 Leben, 25 Ausdauer), Käse (25/25) und Milch (12 Leben, 30 Ausdauer) lassen sich auch einzeln essen. Die Werte stehen in der Config und können dort auf 0 gesetzt werden. Rindfleisch bleibt roh und nicht essbar.
+- **Essbar:** Dönerfleisch (45 Leben, 25 Ausdauer), Käse (30 Leben, 40 Ausdauer) und Milch (12 Leben, 30 Ausdauer) lassen sich auch einzeln essen. Die Werte stehen in der Config und können dort auf 0 gesetzt werden. Rindfleisch bleibt roh und nicht essbar.
 - Die Tooltips dieser Zutaten zeigten Werte von Vanilla-Gegenständen (gekochtes Loxfleisch, Brot), weil sie von Loxfleisch und Teig den Verweis auf das gekochte Gegenstück erbten. Jetzt zeigen sie ihre eigenen Werte, Rindfleisch keine.
 - Die rohen und gebackenen Gerichte zeigen jetzt die Werte des fertigen Feasts an (Leben, Ausdauer, Regeneration, Dauer, auch vom Server), statt der Werte der Vanilla-Pastete.
 - README: Der Bifrost Updater wird nicht mehr erwähnt. Updates laufen über den Mod-Manager oder die Release-Seite.
