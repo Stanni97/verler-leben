@@ -2,7 +2,7 @@
 
 ## 1.4.2
 
-- **Zucht einstellbar:** `BreedLimit` (ab so vielen Kühen und Kälbern im Umkreis von 10 m wird nicht mehr gezüchtet, Standard 0 = keine Obergrenze, eine Lox: 4) und `BreedChancePercent` (Standard 50) im Abschnitt `[Cow]`.
+- **Zucht einstellbar:** `BreedLimit` (ab so vielen Kühen und Kälbern im Umkreis von 20 m wird nicht mehr gezüchtet, Standard 0 = keine Obergrenze; Lox und Wolf: 4, Wildschwein: 5, Huhn: 10) und `BreedChancePercent` (Standard 50, eine Lox: 33; ein Versuch alle 30 Sekunden) im Abschnitt `[Cow]`.
 - **Weniger Kühe in der Wildnis:** `SpawnMax` 2 (vorher 3), `SpawnChancePercent` 25 (vorher 50), `GroupMin` 1 (vorher 2) und `GroupMax` 2 (vorher 3). Werte, die noch auf dem alten Standard stehen, werden beim Start einmal auf die neuen gesetzt.
 
 ## 1.4.1

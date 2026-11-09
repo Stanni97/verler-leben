@@ -431,9 +431,9 @@ namespace VerlerLeben
             GrowSeconds = config.Bind(s, "CalfGrowSeconds", GrowSeconds, ServerSync.Desc("How long a calf needs to grow up.")).Value;
             MilkCooldownSeconds = config.Bind(s, "MilkCooldownSeconds", MilkCooldownSeconds, ServerSync.Desc("Time between two milkings of the same cow (one game day is 1800 s).")).Value;
             BreedLimit = config.Bind(s, "BreedLimit", BreedLimit,
-                ServerSync.Desc("Cows stop breeding when this many cows and calves stand within 10 m of each other. 0 = no limit (a Lox: 4).")).Value;
+                ServerSync.Desc("Cows stop breeding when this many cows and calves stand within 20 m of each other. 0 = no limit (a Lox: 4, a wolf: 4, a boar: 5, a hen: 10).")).Value;
             BreedChance = config.Bind(s, "BreedChancePercent", BreedChance,
-                ServerSync.Desc("Chance per attempt (every 10 s) that two fed, tame cows next to each other start a pregnancy, in percent.")).Value;
+                ServerSync.Desc("Chance per attempt (every 30 s) that two fed, tame cows close to each other (within 8 m) start a pregnancy, in percent (a Lox: 33).")).Value;
             MilkKey = config.Bind(s, "MilkKey", MilkKey,
                 "Key to milk the cow you look at. E makes her follow you or wait, like a wolf. Not used by the game: H, Y, U, J, N.").Value;
             MilkMin = config.Bind(s, "MilkMin", MilkMin, ServerSync.Desc("Least milk per milking.")).Value;
