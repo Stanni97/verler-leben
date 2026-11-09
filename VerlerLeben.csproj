@@ -44,6 +44,7 @@
     <Reference Include="$(ManagedDir)/UnityEngine.dll" Private="false" />
     <Reference Include="$(ManagedDir)/UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="$(ManagedDir)/UnityEngine.AssetBundleModule.dll" Private="false" />
+    <Reference Include="$(ManagedDir)/UnityEngine.PhysicsModule.dll" Private="false" />
     <Reference Include="$(ManagedDir)/UnityEngine.ParticleSystemModule.dll" Private="false" />
     <Reference Include="$(ManagedDir)/assembly_valheim.dll" Private="false" />
     <Reference Include="$(ManagedDir)/assembly_utils.dll" Private="false" />

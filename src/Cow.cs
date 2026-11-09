@@ -13,6 +13,100 @@ namespace VerlerLeben
     /// <summary>Marks the cow prefab, so the milking patches know which Tameable they are looking at.</summary>
     internal class DfCow : MonoBehaviour
     {
+        private MonsterAI _ai;
+        private Character _character;
+        private Tameable _tameable;
+        private ZNetView _nview;
+        private float _timer;
+        private float _lastLog = -1000f;
+
+        private void Awake()
+        {
+            _ai = GetComponent<MonsterAI>();
+            _character = GetComponent<Character>();
+            _tameable = GetComponent<Tameable>();
+            _nview = GetComponent<ZNetView>();
+            _timer = UnityEngine.Random.Range(0f, 3f);
+        }
+
+        /// <summary>
+        /// A hungry tame cow eats food lying around, but the game skips that while she is alerted or has a target
+        /// (a monster that wandered by, a stray animal). She cannot fight, so she lets it go and goes for the food.
+        /// </summary>
+        private void Update()
+        {
+            _timer -= Time.deltaTime;
+            if (_timer > 0f)
+            {
+                return;
+            }
+
+            _timer = 3f;
+            if (_ai == null || _character == null || _tameable == null || _nview == null || !_nview.IsValid() || !_nview.IsOwner()
+                || !_character.IsTamed() || !_tameable.IsHungry() || _ai.m_consumeItems == null)
+            {
+                return;
+            }
+
+            ItemDrop food = FindFood();
+            if (food == null)
+            {
+                return;
+            }
+
+            Traverse ai = Traverse.Create(_ai);
+            bool blocked = _ai.IsAlerted() || ai.Field("m_targetCreature").GetValue() != null || ai.Field("m_targetStatic").GetValue() != null;
+            if (blocked)
+            {
+                ai.Method("SetAlerted", new object[] { false }).GetValue();
+                ai.Field("m_targetCreature").SetValue(null);
+                ai.Field("m_targetStatic").SetValue(null);
+            }
+
+            if (Time.time - _lastLog > 60f)
+            {
+                _lastLog = Time.time;
+                ServerSync.Log?.LogInfo($"Cow is hungry and {food.m_itemData.m_shared.m_name} lies {Vector3.Distance(food.transform.position, transform.position):0.#} m away" +
+                                               (blocked ? " (she was alerted or had a target, reset)." : "."));
+            }
+        }
+
+        private ItemDrop FindFood()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, Mathf.Max(_ai.m_consumeSearchRange, 5f), LayerMask.GetMask("item"));
+            ItemDrop best = null;
+            float distance = float.MaxValue;
+            foreach (Collider hit in hits)
+            {
+                if (hit.attachedRigidbody == null)
+                {
+                    continue;
+                }
+
+                var item = hit.attachedRigidbody.GetComponent<ItemDrop>();
+                if (item == null || item.m_itemData == null)
+                {
+                    continue;
+                }
+
+                foreach (ItemDrop eats in _ai.m_consumeItems)
+                {
+                    if (eats != null && eats.m_itemData.m_shared.m_name == item.m_itemData.m_shared.m_name)
+                    {
+                        float d = Vector3.Distance(item.transform.position, transform.position);
+                        if (d < distance)
+                        {
+                            distance = d;
+                            best = item;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            return best;
+        }
     }
 
     /// <summary>
@@ -235,6 +329,9 @@ namespace VerlerLeben
             var ai = cow.GetComponent<MonsterAI>();
             ai.m_attackPlayerObjects = false;
             ai.m_enableHuntPlayer = false;
+            ai.m_consumeSearchRange = 15f;      // food lying within 15 m, looked for every 3 s (a Lox: 10 m, every 10 s)
+            ai.m_consumeSearchInterval = 3f;
+            ai.m_consumeRange = 4f;
 
             var tameable = cow.GetComponent<Tameable>();
             tameable.m_tamingTime = settings.TamingSeconds;

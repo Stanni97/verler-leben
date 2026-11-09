@@ -5,6 +5,8 @@
 - **Zucht einstellbar:** `BreedLimit` (ab so vielen Kühen und Kälbern im Umkreis von 20 m wird nicht mehr gezüchtet, Standard 0 = keine Obergrenze; Lox und Wolf: 4, Wildschwein: 5, Huhn: 10) und `BreedChancePercent` (Standard 50, eine Lox: 33; ein Versuch alle 30 Sekunden) im Abschnitt `[Cow]`.
 - **Weniger Kühe in der Wildnis:** `SpawnMax` 2 (vorher 3), `SpawnChancePercent` 25 (vorher 50), `GroupMin` 1 (vorher 2) und `GroupMax` 2 (vorher 3). Werte, die noch auf dem alten Standard stehen, werden beim Start einmal auf die neuen gesetzt.
 
+- **Kühe fressen Futter vom Boden:** Eine hungrige, gezähmte Kuh sucht jetzt im Umkreis von 15 m (vorher 10 m) alle 3 Sekunden (vorher 10) nach Gerste und Flachs. War sie alarmiert oder hatte sie ein Ziel (zum Beispiel ein vorbeigelaufenes Tier), hat das Spiel die Futtersuche übersprungen; das wird jetzt zurückgesetzt, weil sie nicht kämpfen kann. Im Log steht dann eine Zeile "Cow is hungry and ... lies ... m away".
+
 ## 1.4.1
 
 - **Essbar:** Dönerfleisch (45 Leben, 25 Ausdauer), Käse (30 Leben, 40 Ausdauer) und Milch (12 Leben, 30 Ausdauer) lassen sich auch einzeln essen. Die Werte stehen in der Config und können dort auf 0 gesetzt werden. Rindfleisch bleibt roh und nicht essbar.
