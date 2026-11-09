@@ -148,6 +148,7 @@ namespace VerlerLeben
 
             _cowPrefab.GetComponent<Humanoid>().m_health = settings.Health;
             SetTaming(_cowPrefab.GetComponent<Tameable>(), settings);
+            SetBreeding(_cowPrefab.GetComponent<Procreation>(), settings);
             _calfPrefab.GetComponent<Growup>().m_growTime = settings.GrowSeconds;
 
             foreach (Character character in Character.GetAllCharacters())
@@ -160,11 +161,21 @@ namespace VerlerLeben
                 if (character.GetComponent<DfCow>() != null)
                 {
                     SetTaming(character.GetComponent<Tameable>(), settings);
+                    SetBreeding(character.GetComponent<Procreation>(), settings);
                 }
                 else if (character.GetComponent<Growup>() is Growup growup && growup.m_grownPrefab == _cowPrefab)
                 {
                     growup.m_growTime = settings.GrowSeconds;
                 }
+            }
+        }
+
+        private static void SetBreeding(Procreation procreation, CowSettings settings)
+        {
+            if (procreation != null)
+            {
+                procreation.m_maxCreatures = settings.BreedLimit <= 0 ? int.MaxValue : settings.BreedLimit;
+                procreation.m_pregnancyChance = Mathf.Clamp01(settings.BreedChance / 100f);
             }
         }
 
@@ -232,8 +243,7 @@ namespace VerlerLeben
 
             var procreation = cow.GetComponent<Procreation>();
             procreation.m_offspring = calf;
-            procreation.m_maxCreatures = 4;
-            procreation.m_pregnancyChance = 0.5f;
+            SetBreeding(procreation, settings);
         }
 
         private static void ConfigureCalf(GameObject calf, GameObject cow, CowSettings settings)
@@ -388,10 +398,12 @@ namespace VerlerLeben
     {
         public bool Enabled = true;
         public Heightmap.Biome SpawnBiome = Heightmap.Biome.Plains;
-        public int SpawnMax = 3;
-        public float SpawnChance = 50f;
-        public int GroupMin = 2;
-        public int GroupMax = 3;
+        public int SpawnMax = 2;
+        public float SpawnChance = 25f;
+        public int GroupMin = 1;
+        public int GroupMax = 2;
+        public int BreedLimit;                // cows and calves within 10 m before breeding stops; 0 = no limit
+        public float BreedChance = 50f;       // percent per attempt, one attempt every 10 s
         public float Scale = 0.65f;
         public float Health = 150f;
         public float TamingSeconds = 300f;
@@ -418,6 +430,10 @@ namespace VerlerLeben
             FedSeconds = config.Bind(s, "FedSeconds", FedSeconds, ServerSync.Desc("How long a meal of Barley or Flax keeps a cow fed.")).Value;
             GrowSeconds = config.Bind(s, "CalfGrowSeconds", GrowSeconds, ServerSync.Desc("How long a calf needs to grow up.")).Value;
             MilkCooldownSeconds = config.Bind(s, "MilkCooldownSeconds", MilkCooldownSeconds, ServerSync.Desc("Time between two milkings of the same cow (one game day is 1800 s).")).Value;
+            BreedLimit = config.Bind(s, "BreedLimit", BreedLimit,
+                ServerSync.Desc("Cows stop breeding when this many cows and calves stand within 10 m of each other. 0 = no limit (a Lox: 4).")).Value;
+            BreedChance = config.Bind(s, "BreedChancePercent", BreedChance,
+                ServerSync.Desc("Chance per attempt (every 10 s) that two fed, tame cows next to each other start a pregnancy, in percent.")).Value;
             MilkKey = config.Bind(s, "MilkKey", MilkKey,
                 "Key to milk the cow you look at. E makes her follow you or wait, like a wolf. Not used by the game: H, Y, U, J, N.").Value;
             MilkMin = config.Bind(s, "MilkMin", MilkMin, ServerSync.Desc("Least milk per milking.")).Value;

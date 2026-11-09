@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2
+
+- **Zucht einstellbar:** `BreedLimit` (ab so vielen Kühen und Kälbern im Umkreis von 10 m wird nicht mehr gezüchtet, Standard 0 = keine Obergrenze, eine Lox: 4) und `BreedChancePercent` (Standard 50) im Abschnitt `[Cow]`.
+- **Weniger Kühe in der Wildnis:** `SpawnMax` 2 (vorher 3), `SpawnChancePercent` 25 (vorher 50), `GroupMin` 1 (vorher 2) und `GroupMax` 2 (vorher 3). Werte, die noch auf dem alten Standard stehen, werden beim Start einmal auf die neuen gesetzt.
+
 ## 1.4.1
 
 - **Essbar:** Dönerfleisch (45 Leben, 25 Ausdauer), Käse (30 Leben, 40 Ausdauer) und Milch (12 Leben, 30 Ausdauer) lassen sich auch einzeln essen. Die Werte stehen in der Config und können dort auf 0 gesetzt werden. Rindfleisch bleibt roh und nicht essbar.

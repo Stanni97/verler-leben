@@ -156,7 +156,7 @@ Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `Craftin
 
 Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
 
-Der Abschnitt `[Cow]` schaltet das Spawnen der Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnBiome`, `SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`) und das Melken (`MilkKey`, `MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
+Der Abschnitt `[Cow]` schaltet das Spawnen der Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnBiome`, `SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`, `BreedLimit`, `BreedChancePercent`) und das Melken (`MilkKey`, `MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
 
 Die Prefab-Namen der Vanilla-Zutaten stehen in der [Jotunn-Itemliste](https://valheim-modding.github.io/Jotunn/data/objects/item-list.html).
 

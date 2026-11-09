@@ -15,11 +15,20 @@ namespace VerlerLeben
     internal static class ConfigMigration
     {
         /// <summary>Raise this when a default changes and add the old default to <see cref="OldDefaults"/>.</summary>
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
 
         private const string VersionKey = "ConfigVersion";
 
-        // section, key, values that used to be the default in earlier versions
+        // Version 3 (1.5.0): fewer cows in the wild.
+        private static readonly (string section, string key, string[] old)[] OldDefaultsV3 =
+        {
+            ("Cow", "SpawnMax", new[] { "3" }),
+            ("Cow", "SpawnChancePercent", new[] { "50" }),
+            ("Cow", "GroupMin", new[] { "2" }),
+            ("Cow", "GroupMax", new[] { "3" }),
+        };
+
+        // section, key, values that used to be the default in earlier versions (replaced when the config is older than version 2)
         private static readonly (string section, string key, string[] old)[] OldDefaults =
         {
             ("Doener", "Ingredients", new[]
@@ -75,6 +84,28 @@ namespace VerlerLeben
             return 0;
         }
 
+        private static int Replace(ConfigFile config, (string section, string key, string[] old)[] list)
+        {
+            int changed = 0;
+            foreach (var (section, key, old) in list)
+            {
+                if (!config.ContainsKey(new ConfigDefinition(section, key)))
+                {
+                    continue;
+                }
+
+                ConfigEntryBase entry = config[section, key];
+                string current = Convert.ToString(entry.BoxedValue, CultureInfo.InvariantCulture);
+                if (Array.IndexOf(old, current) >= 0 && !Equals(entry.BoxedValue, entry.DefaultValue))
+                {
+                    entry.BoxedValue = entry.DefaultValue;
+                    changed++;
+                }
+            }
+
+            return changed;
+        }
+
         /// <summary>Call after all entries are bound.</summary>
         public static void Apply(ConfigFile config, int storedVersion, ManualLogSource log)
         {
@@ -83,21 +114,12 @@ namespace VerlerLeben
             if (storedVersion < CurrentVersion)
             {
                 int changed = 0;
-                foreach (var (section, key, old) in OldDefaults)
+                if (storedVersion < 2)
                 {
-                    if (!config.ContainsKey(new ConfigDefinition(section, key)))
-                    {
-                        continue;
-                    }
-
-                    ConfigEntryBase entry = config[section, key];
-                    string current = Convert.ToString(entry.BoxedValue, CultureInfo.InvariantCulture);
-                    if (Array.IndexOf(old, current) >= 0 && !Equals(entry.BoxedValue, entry.DefaultValue))
-                    {
-                        entry.BoxedValue = entry.DefaultValue;
-                        changed++;
-                    }
+                    changed += Replace(config, OldDefaults);
                 }
+
+                changed += Replace(config, OldDefaultsV3);
 
                 if (changed > 0)
                 {
