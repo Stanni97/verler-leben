@@ -32,6 +32,7 @@ In den **Ebenen** laufen jetzt Kühe herum, dort wachsen auch Gerste und Flachs,
 - **Melken:** Mit **H** melkst du die zahme, satte Kuh, die du ansiehst (die Taste ist in der Config einstellbar). Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch.
 - **Züchten:** Zwei zahme Kühe, regelmäßig gefüttert und nahe beieinander, bekommen Kälber. Das Kalb wächst nach etwa 20 Minuten heran.
 - **Schlachten:** Sie droppt 2 bis 3 Rindfleisch und etwas Lederreste.
+- **Laute:** Die Kühe muhen (auch beim Treffer und Sterben), das Kalb ruft hell, Momo brüllt tief. In der Config lässt sich das mit `[Cow] Sounds = false` abschalten.
 
 ### Momo, der Zuchtbulle
 

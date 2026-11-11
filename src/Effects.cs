@@ -7,8 +7,8 @@ using UnityEngine;
 namespace VerlerLeben
 {
     /// <summary>
-    /// The Lox loses brown hair flakes (particles with the material lox_hair_particle) when it is hit and when it dies.
-    /// On a black and white cow that looks wrong, so the cow, the calf and the bull get copies of the effects without them.
+    /// Cow, calf and bull get their own copies of the Lox effects: without the brown hair flakes the Lox sheds when it is hit
+    /// and when it dies (particles with the material lox_hair_particle), and with moos instead of the Lox's grunts.
     /// </summary>
     internal static class Effects
     {
@@ -16,25 +16,50 @@ namespace VerlerLeben
 
         private static readonly Dictionary<string, GameObject> Cleaned = new Dictionary<string, GameObject>();
 
-        /// <summary>Hit, death and every other effect list of the creature, without the hair.</summary>
-        public static void RemoveHair(GameObject creature, ManualLogSource log)
+        /// <summary>Which sound role an effect list of the creature plays, by field name.</summary>
+        private static string RoleOf(string field)
         {
-            var character = creature.GetComponent<Character>();
-            if (character == null)
+            switch (field)
             {
-                return;
+                case "m_hitEffects":
+                case "m_critHitEffects":
+                case "m_backstabHitEffects":
+                    return "hit";
+                case "m_deathEffects":
+                    return "death";
+                case "m_idleSound":
+                case "m_petEffect":
+                case "m_tamedEffect":
+                    return "idle";
+                case "m_alertedEffects":
+                    return "alert";
+                default:
+                    return null;
             }
+        }
 
-            foreach (FieldInfo field in typeof(Character).GetFields(BindingFlags.Public | BindingFlags.Instance))
+        /// <summary>
+        /// Every effect list of the creature, without the hair. With a voice ("cow", "calf" or "bull") the sounds in them
+        /// are replaced by that voice.
+        /// </summary>
+        public static void Prepare(GameObject creature, string voice, bool sounds, ManualLogSource log)
+        {
+            foreach (Component component in creature.GetComponents<Component>())
             {
-                if (field.FieldType == typeof(EffectList))
+                if (component is Character || component is BaseAI || component is Tameable)
                 {
-                    Clean((EffectList)field.GetValue(character), log);
+                    foreach (FieldInfo field in component.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+                    {
+                        if (field.FieldType == typeof(EffectList))
+                        {
+                            Clean((EffectList)field.GetValue(component), sounds ? voice : null, sounds ? RoleOf(field.Name) : null, log);
+                        }
+                    }
                 }
             }
         }
 
-        public static void Clean(EffectList list, ManualLogSource log)
+        public static void Clean(EffectList list, string voice, string role, ManualLogSource log)
         {
             if (list?.m_effectPrefabs == null)
             {
@@ -48,10 +73,10 @@ namespace VerlerLeben
                     continue;
                 }
 
-                GameObject clean = Hairless(effect.m_prefab, log);
-                if (clean != null)
+                GameObject copy = Variant(effect.m_prefab, voice, role, log);
+                if (copy != null)
                 {
-                    effect.m_prefab = clean;
+                    effect.m_prefab = copy;
                 }
             }
         }
@@ -71,21 +96,25 @@ namespace VerlerLeben
             return found;
         }
 
-        /// <summary>A copy of the effect without the hair, or null if it has none.</summary>
-        private static GameObject Hairless(GameObject original, ManualLogSource log)
+        /// <summary>A copy of the effect without hair and with the voice, or null if it needs none.</summary>
+        private static GameObject Variant(GameObject original, string voice, string role, ManualLogSource log)
         {
-            if (Cleaned.TryGetValue(original.name, out GameObject known))
+            string key = original.name + "|" + voice + "|" + role;
+            if (Cleaned.TryGetValue(key, out GameObject known))
             {
                 return known;
             }
 
-            if (HairRenderers(original).Count == 0)
+            AudioClip[] clips = voice != null && role != null ? Voices.Get(voice, role, log) : null;
+            ZSFX[] sfx = clips != null ? original.GetComponentsInChildren<ZSFX>(true) : new ZSFX[0];
+            if (HairRenderers(original).Count == 0 && sfx.Length == 0)
             {
-                Cleaned[original.name] = null;
+                Cleaned[key] = null;
                 return null;
             }
 
-            GameObject copy = PrefabManager.Instance.CreateClonedPrefab("DF_" + original.name, original);
+            string name = "DF_" + (voice ?? "x") + "_" + (role ?? "x") + "_" + original.name;
+            GameObject copy = PrefabManager.Instance.CreateClonedPrefab(name, original);
             if (copy == null)
             {
                 return null;
@@ -103,9 +132,19 @@ namespace VerlerLeben
                 }
             }
 
+            if (clips != null)
+            {
+                foreach (ZSFX z in copy.GetComponentsInChildren<ZSFX>(true))
+                {
+                    z.m_audioClips = clips;
+                    z.m_minPitch = 0.94f;
+                    z.m_maxPitch = 1.06f;
+                }
+            }
+
             PrefabManager.Instance.AddPrefab(copy);
-            Cleaned[original.name] = copy;
-            log?.LogInfo("Effect " + original.name + " copied without the Lox hair.");
+            Cleaned[key] = copy;
+            log?.LogInfo("Effect " + original.name + " copied as " + name + ".");
             return copy;
         }
     }

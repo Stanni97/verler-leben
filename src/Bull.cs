@@ -141,7 +141,7 @@ namespace VerlerLeben
             ai.m_consumeRange = 4f;
             ai.m_pathAgentType = Pathfinding.AgentType.HorseSize;
             Configure(prefab, settings);
-            Effects.RemoveHair(prefab, log);
+            Effects.Prepare(prefab, "bull", settings.Sounds, log);
 
             try
             {
