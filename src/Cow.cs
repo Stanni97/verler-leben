@@ -180,6 +180,8 @@ namespace VerlerLeben
             }
 
             ConfigureCow(cow.Prefab, calf.Prefab, settings);
+            Effects.RemoveHair(cow.Prefab, log);
+            Effects.RemoveHair(calf.Prefab, log);
             GameObject bull = Bulls.Add(settings, log);
             ConfigureCalf(calf.Prefab, cow.Prefab, bull, settings);
             _bullPrefab = bull;
@@ -309,6 +311,7 @@ namespace VerlerLeben
             }
 
             ragdoll.transform.localScale = Vector3.one * scale;
+            Effects.Clean(ragdoll.GetComponent<Ragdoll>()?.m_removeEffect, log);
             PrefabManager.Instance.AddPrefab(ragdoll);
             foreach (EffectList.EffectData effect in character.m_deathEffects.m_effectPrefabs)
             {
