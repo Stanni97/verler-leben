@@ -17,7 +17,6 @@ namespace VerlerLeben
         private Character _character;
         private ZNetView _nview;
         private float _tameTimer;
-        private float _calm;
 
         internal Character AngryAt;
         internal float AngryUntil;
