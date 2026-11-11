@@ -536,7 +536,7 @@ namespace VerlerLeben
         public KeyCode MilkKey = KeyCode.H;
         public int MilkMin = 1;
         public int MilkMax = 2;
-        public bool Sounds = true;             // moos instead of the Lox's grunts; this player's own choice, needs a restart
+        public bool Sounds = true;             // moos instead of the Lox's grunts; always on, there is no option
         public float BullChance = 25f;         // percent of the calves that grow into Momo
         public float BullHealth = 1200f;       // a Lox: 1000
         public float BullScale = 0.9f;
@@ -567,9 +567,6 @@ namespace VerlerLeben
                 "Key to milk the cow you look at. E makes her follow you or wait, like a wolf. Not used by the game: H, Y, U, J, N.").Value;
             MilkMin = config.Bind(s, "MilkMin", MilkMin, ServerSync.Desc("Least milk per milking.")).Value;
             MilkMax = config.Bind(s, "MilkMax", MilkMax, ServerSync.Desc("Most milk per milking.")).Value;
-
-            Sounds = config.Bind(s, "Sounds", Sounds,
-                "Cows, calves and Momo moo instead of grunting like a Lox. Only your own game, needs a restart.").Value;
 
             const string b = "Bull";
             BullChance = config.Bind(b, "BullChancePercent", BullChance,
