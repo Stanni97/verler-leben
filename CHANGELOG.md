@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1
+
+- **Echte Kuh-Laute:** Die selbst erzeugten Klänge von 1.5.0 sind ersetzt durch echte Kuh-Aufnahmen von Wikimedia Commons ("Single Cow Moo" von MichaeltheFox8621, CC BY-SA 4.0, und "Mudchute cow 1" von Secretlondon, CC BY-SA 3.0), geschnitten und in der Tonhöhe verändert: höher fürs Kalb, tiefer für Momo. Die Quellen stehen im README unter "Credits".
+
 ## 1.5.0
 
 - **Momo, der Zuchtbulle:** Ein Teil der Kälber (`[Bull] BullChancePercent`, Standard 25) wächst zu einem Bullen heran: Hörner, Blume, Halsband mit Glocke und Namensschild "MOMO" und rosa gestreifte Strümpfe. Er ist mindestens so stark wie ein Lox (1200 Leben, 1,5-facher Schaden), von Geburt an zahm, beschützt die Herde gegen Monster und greift keinen Spieler an, außer er wird zuerst geschlagen. Er lässt sich nicht melken, gibt aber 4 bis 6 Rindfleisch. Leben, Größe, Schaden und Wachreichweite stehen in der Config.

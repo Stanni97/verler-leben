@@ -226,3 +226,7 @@ Inoffizieller Fan-Mod ohne Verbindung zu Schroeders Likör Manufaktur oder ander
 ## Lizenz
 
 Code und Icons stehen unter der [MIT-Lizenz](LICENSE).
+
+## Credits
+
+The cow, calf and Momo sounds are cut and pitch-shifted from two recordings on Wikimedia Commons: "Single Cow Moo" by MichaeltheFox8621 (CC BY-SA 4.0) and "Mudchute cow 1" by Secretlondon (CC BY-SA 3.0). The sound files (`Assets/*.wav`) are shared under the same licences.
