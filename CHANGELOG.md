@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0
+
+- **Momo, der Zuchtbulle:** Ein Teil der Kälber (`[Bull] BullChancePercent`, Standard 25) wächst zu einem Bullen heran: Hörner, Blume, Halsband mit Glocke und Namensschild "MOMO" und rosa gestreifte Strümpfe. Er ist mindestens so stark wie ein Lox (1200 Leben, 1,5-facher Schaden), von Geburt an zahm, beschützt die Herde gegen Monster und greift keinen Spieler an, außer er wird zuerst geschlagen. Er lässt sich nicht melken, gibt aber 4 bis 6 Rindfleisch. Leben, Größe, Schaden und Wachreichweite stehen in der Config.
+- **Kühe haben mehr Leben:** 250 statt 150. Steht der Wert noch auf 150, wird er einmal auf den neuen Standard gesetzt.
+- **Füttern:** Gezähmte Kühe liefen nicht zum Futter auf dem Boden, wenn der Weg dorthin für einen Lox (2 m breit, 7 m hoch) zu eng war, zum Beispiel im Stall oder am Zaun. Sie suchen jetzt mit dem Wegenetz eines Pferdes. Nur wenn man das Futter direkt vor sie warf, fraßen sie es.
+- Hinweis zu "Erworben durch Cheaten" im Tooltip: Das ist die Markierung des Spiels, nicht ein Text dieser Mod. Sie entsteht, wenn ein Gegenstand per Konsole erzeugt wurde, an einer Station hergestellt wurde, die mit solchen Gegenständen gebaut wurde, oder aus Zutaten besteht, die so markiert sind.
+
 ## 1.4.2
 
 - **Zucht einstellbar:** `BreedLimit` (ab so vielen Kühen und Kälbern im Umkreis von 20 m wird nicht mehr gezüchtet, Standard 0 = keine Obergrenze; Lox und Wolf: 4, Wildschwein: 5, Huhn: 10) und `BreedChancePercent` (Standard 50, eine Lox: 33; ein Versuch alle 30 Sekunden) im Abschnitt `[Cow]`.

@@ -15,11 +15,17 @@ namespace VerlerLeben
     internal static class ConfigMigration
     {
         /// <summary>Raise this when a default changes and add the old default to <see cref="OldDefaults"/>.</summary>
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
 
         private const string VersionKey = "ConfigVersion";
 
-        // Version 3 (1.5.0): fewer cows in the wild.
+        // Version 4 (1.5.0): a cow has a bit more health.
+        private static readonly (string section, string key, string[] old)[] OldDefaultsV4 =
+        {
+            ("Cow", "Health", new[] { "150" }),
+        };
+
+        // Version 3 (1.4.2): fewer cows in the wild.
         private static readonly (string section, string key, string[] old)[] OldDefaultsV3 =
         {
             ("Cow", "SpawnMax", new[] { "3" }),
@@ -119,7 +125,12 @@ namespace VerlerLeben
                     changed += Replace(config, OldDefaults);
                 }
 
-                changed += Replace(config, OldDefaultsV3);
+                if (storedVersion < 3)
+                {
+                    changed += Replace(config, OldDefaultsV3);
+                }
+
+                changed += Replace(config, OldDefaultsV4);
 
                 if (changed > 0)
                 {

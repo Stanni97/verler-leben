@@ -17,6 +17,8 @@ namespace VerlerLeben
     internal static class CowModel
     {
         private const string MeshResource = "VerlerLeben.cow_mesh.bin";
+        private const string MomoMeshResource = "VerlerLeben.cow_momo_mesh.bin";
+        private const string MomoTextureResource = "VerlerLeben.cow_momo.png";
 
         // Holstein (black and white), red and white, brown. Weights: how often each coat appears.
         private static readonly (string resource, int weight)[] Coats =
@@ -28,9 +30,10 @@ namespace VerlerLeben
 
         private static readonly Dictionary<string, Mesh> Meshes = new Dictionary<string, Mesh>();
         internal static Material[] CoatMaterials;
+        private static Material _momoMaterial;
 
         /// <summary>Returns false if the prefab has no Lox body to replace or the data is missing.</summary>
-        public static bool Apply(GameObject prefab, bool ragdoll = false)
+        public static bool Apply(GameObject prefab, bool ragdoll = false, bool momo = false)
         {
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
             {
@@ -43,7 +46,14 @@ namespace VerlerLeben
                 return false;
             }
 
-            if (CoatMaterials == null)
+            if (momo)
+            {
+                if (_momoMaterial == null)
+                {
+                    _momoMaterial = CoatMaterial(body.sharedMaterial, LoadTexture(MomoTextureResource));
+                }
+            }
+            else if (CoatMaterials == null)
             {
                 CoatMaterials = new Material[Coats.Length];
                 for (int i = 0; i < Coats.Length; i++)
@@ -53,22 +63,22 @@ namespace VerlerLeben
             }
 
             // One mesh per bone order, the Lox, its calf and the ragdolls all have the same 31 bones.
-            string order = string.Join(",", Array.ConvertAll(body.bones, b => b == null ? "" : b.name));
+            string order = (momo ? "momo|" : "") + string.Join(",", Array.ConvertAll(body.bones, b => b == null ? "" : b.name));
             if (!Meshes.TryGetValue(order, out Mesh mesh))
             {
-                mesh = LoadMesh(body.bones);
+                mesh = LoadMesh(body.bones, momo ? MomoMeshResource : MeshResource, momo ? "DF_Bulle" : "DF_Kuh");
                 mesh.bindposes = body.sharedMesh.bindposes;
                 Meshes[order] = mesh;
             }
 
             body.sharedMesh = mesh;
-            body.sharedMaterials = new[] { CoatMaterials[0] };
+            body.sharedMaterials = new[] { momo ? _momoMaterial : CoatMaterials[0] };
             if (!ragdoll && prefab.GetComponent<CowLegs>() == null)
             {
                 prefab.AddComponent<CowLegs>();   // a ragdoll falls by physics, its legs must not be pulled straight
             }
 
-            if (prefab.GetComponent<CowCoat>() == null)
+            if (!momo && prefab.GetComponent<CowCoat>() == null)
             {
                 prefab.AddComponent<CowCoat>();
             }
@@ -157,9 +167,9 @@ namespace VerlerLeben
             return material;
         }
 
-        private static Mesh LoadMesh(Transform[] skeleton)
+        private static Mesh LoadMesh(Transform[] skeleton, string resource, string meshName)
         {
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(MeshResource))
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource))
             using (var reader = new BinaryReader(stream))
             {
                 if (Encoding.ASCII.GetString(reader.ReadBytes(4)) != "COW2")
@@ -210,7 +220,7 @@ namespace VerlerLeben
                     triangles[i] = reader.ReadInt32();
                 }
 
-                var mesh = new Mesh { name = "DF_Kuh" };
+                var mesh = new Mesh { name = meshName };
                 mesh.vertices = vertices;
                 mesh.normals = normals;
                 mesh.uv = uvs;

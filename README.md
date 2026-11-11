@@ -33,6 +33,17 @@ In den **Ebenen** laufen jetzt Kühe herum, dort wachsen auch Gerste und Flachs,
 - **Züchten:** Zwei zahme Kühe, regelmäßig gefüttert und nahe beieinander, bekommen Kälber. Das Kalb wächst nach etwa 20 Minuten heran.
 - **Schlachten:** Sie droppt 2 bis 3 Rindfleisch und etwas Lederreste.
 
+### Momo, der Zuchtbulle
+
+<img src="Assets/momo.png" width="260" alt="Momo, der Zuchtbulle">
+
+Manche Kälber (Standard 25 %) werden keine Kuh, sondern **Momo**: ein Bulle mit Hörnern, Blume, Halsband mit Glocke und Namensschild und rosa gestreiften Strümpfen. Er kommt nur durch Zucht in die Welt, nicht in der Wildnis.
+
+- **Stark wie ein Lox:** 1200 Leben (ein Lox: 1000) und der 1,5-fache Schaden eines Lox. Er beschützt die Herde und greift Monster an, die in ihre Nähe kommen (Standard: er bemerkt sie ab 40 m).
+- **Friedlich zu Spielern:** Momo ist von Geburt an zahm und tut dir nichts, außer du schlägst ihn. Dann wehrt er sich eine halbe Minute lang. Harmlose Tiere wie Rehe und Wildschweine lässt er in Ruhe.
+- **Nicht melkbar**, dafür gibt er beim Schlachten mehr: 4 bis 6 Rindfleisch und 2 bis 3 Lederreste. Er züchtet nicht selbst, das machen die Kühe.
+- Er frisst wie die Kühe Gerste und Flachs, auch vom Boden.
+
 ## Herstellung
 
 1. **Zutaten** am Essenszubereitungstisch (Food Preparation Table) herstellen:
@@ -155,6 +166,8 @@ Die Abschnitte `[Teller]`, `[Pizza]` und `[Manta]` (die Feasts):
 Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`. Beide sind auch einzeln essbar (`Health`, `Stamina`, `HealthRegen`, `DurationSeconds`; Leben und Ausdauer auf 0 macht sie wieder ungenießbar). Dasselbe gilt für die Milch im Abschnitt `[Milch]`. Rindfleisch ist roh und nicht essbar.
 
 Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
+
+Der Abschnitt `[Bull]` stellt Momo ein: `BullChancePercent` (wie viele Kälber Bullen werden, 0 = keine), `Health`, `Scale`, `DamageMultiplier` und `GuardRangeMetres` (ab welcher Entfernung er Monster bemerkt).
 
 Der Abschnitt `[Cow]` schaltet das Spawnen der Kuh ein oder aus (`Enabled`) und stellt Spawn (`SpawnBiome`, `SpawnMax`, `SpawnChancePercent`, `GroupMin`, `GroupMax`), Größe und Leben (`Scale`, `Health`), Zähmen und Züchten (`TamingSeconds`, `FedSeconds`, `CalfGrowSeconds`, `BreedLimit`, `BreedChancePercent`) und das Melken (`MilkKey`, `MilkCooldownSeconds`, `MilkMin`, `MilkMax`) ein.
 

@@ -24,3 +24,14 @@ kommen Fellstruktur, ein etwas dunklerer Bauch und gebackene Umgebungsverdeckung
 Dreiecke um) und ordnet ihre Knochen den Lox-Knochen zu. Weil der Lox breiter steht und die Beine tiefer beugt, wird
 die Kuh etwas breiter (`WIDTH`), die Beine rücken auseinander (`SPREAD`), und die Beine werden nach der Höhe der
 Lox-Gelenke gewichtet. Im Spiel richtet `CowLegs` die Beine nach jeder Animation gerade aus.
+
+## Momo (der Bulle)
+
+`Assets/cow_momo_mesh.bin` und `Assets/cow_momo.png` sind dieselbe Kuh mit Zubehör: Hörner, Blume, Halsband mit Glocke und
+Namensschild, Schleifen an den Strümpfen. Das Euter ist in den Bauch gedrückt. Die Textur (1024 x 512) hat links das Fell
+mit rosa gestreiften Strümpfen, rechts einfarbige Felder für das Zubehör und das Schild "MOMO".
+
+1. `python3 build_momo.py cow_smooth.json loxskel.json ../../Assets/cow_momo_mesh.bin preview_momo.json`
+   (`momo_assemble.py` platziert das Zubehör, `momo_parts.py` baut die Formen)
+2. `python3 paint_momo.py cow_smooth.json ../../Assets/cow_schwarzbunt.png ../../Assets/cow_momo.png` (Pillow und numpy)
+3. Vorschau: `blender -b --factory-startup --python preview.py -- preview_momo.json ../../Assets/cow_momo.png prev`

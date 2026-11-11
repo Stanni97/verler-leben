@@ -10,8 +10,13 @@ using UnityEngine.Rendering;
 
 namespace VerlerLeben
 {
-    /// <summary>Marks the cow prefab, so the milking patches know which Tameable they are looking at.</summary>
-    internal class DfCow : MonoBehaviour
+    /// <summary>Marks the cow prefab, so the milking patches know which Tameable they are looking at. A bull is no DfCow.</summary>
+    internal class DfCow : DfFeeder
+    {
+    }
+
+    /// <summary>Feeding behaviour shared by cows and bulls.</summary>
+    internal class DfFeeder : MonoBehaviour
     {
         private MonsterAI _ai;
         private Character _character;
@@ -20,7 +25,7 @@ namespace VerlerLeben
         private float _timer;
         private float _lastLog = -1000f;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             _ai = GetComponent<MonsterAI>();
             _character = GetComponent<Character>();
@@ -33,7 +38,7 @@ namespace VerlerLeben
         /// A hungry tame cow eats food lying around, but the game skips that while she is alerted or has a target
         /// (a monster that wandered by, a stray animal). She cannot fight, so she lets it go and goes for the food.
         /// </summary>
-        private void Update()
+        protected virtual void Update()
         {
             _timer -= Time.deltaTime;
             if (_timer > 0f)
@@ -123,7 +128,7 @@ namespace VerlerLeben
         internal static CowSettings Settings;
 
         private static CustomCreature _cow;
-        private static GameObject _cowPrefab, _calfPrefab, _cowRagdoll, _calfRagdoll;
+        private static GameObject _cowPrefab, _calfPrefab, _bullPrefab, _cowRagdoll, _calfRagdoll;
 
         public static void Add(CowSettings settings, ManualLogSource log)
         {
@@ -174,8 +179,10 @@ namespace VerlerLeben
                 return;
             }
 
-            ConfigureCalf(calf.Prefab, cow.Prefab, settings);
             ConfigureCow(cow.Prefab, calf.Prefab, settings);
+            GameObject bull = Bulls.Add(settings, log);
+            ConfigureCalf(calf.Prefab, cow.Prefab, bull, settings);
+            _bullPrefab = bull;
 
             try
             {
@@ -243,7 +250,8 @@ namespace VerlerLeben
             _cowPrefab.GetComponent<Humanoid>().m_health = settings.Health;
             SetTaming(_cowPrefab.GetComponent<Tameable>(), settings);
             SetBreeding(_cowPrefab.GetComponent<Procreation>(), settings);
-            _calfPrefab.GetComponent<Growup>().m_growTime = settings.GrowSeconds;
+            SetGrowup(_calfPrefab.GetComponent<Growup>(), _cowPrefab, _bullPrefab, settings);
+            Bulls.Apply(settings);
 
             foreach (Character character in Character.GetAllCharacters())
             {
@@ -259,7 +267,7 @@ namespace VerlerLeben
                 }
                 else if (character.GetComponent<Growup>() is Growup growup && growup.m_grownPrefab == _cowPrefab)
                 {
-                    growup.m_growTime = settings.GrowSeconds;
+                    SetGrowup(growup, _cowPrefab, _bullPrefab, settings);
                 }
             }
         }
@@ -283,7 +291,7 @@ namespace VerlerLeben
         }
 
         /// <summary>A copy of the Lox ragdoll with the cow model, in the death effects of the cow instead of the original.</summary>
-        private static GameObject ReplaceRagdoll(GameObject creature, string originalName, string name, float scale, ManualLogSource log)
+        internal static GameObject ReplaceRagdoll(GameObject creature, string originalName, string name, float scale, ManualLogSource log, bool momo = false)
         {
             GameObject original = PrefabManager.Instance.GetPrefab(originalName);
             var character = creature.GetComponent<Character>();
@@ -294,7 +302,7 @@ namespace VerlerLeben
             }
 
             GameObject ragdoll = PrefabManager.Instance.CreateClonedPrefab(name, original);
-            if (ragdoll == null || !CowModel.Apply(ragdoll, ragdoll: true))
+            if (ragdoll == null || !CowModel.Apply(ragdoll, ragdoll: true, momo: momo))
             {
                 log.LogWarning("Could not build the ragdoll " + name + ".");
                 return null;
@@ -332,6 +340,9 @@ namespace VerlerLeben
             ai.m_consumeSearchRange = 15f;      // food lying within 15 m, looked for every 3 s (a Lox: 10 m, every 10 s)
             ai.m_consumeSearchInterval = 3f;
             ai.m_consumeRange = 4f;
+            // A Lox needs a path 2 m wide and 7 m high; a pen with a roof, a gate or a fence close by has none, so tame cows never
+            // walked to food lying in it. A horse-sized path (1.6 m wide, 2.5 m high) fits a cow.
+            ai.m_pathAgentType = Pathfinding.AgentType.HorseSize;
 
             var tameable = cow.GetComponent<Tameable>();
             tameable.m_tamingTime = settings.TamingSeconds;
@@ -343,7 +354,22 @@ namespace VerlerLeben
             SetBreeding(procreation, settings);
         }
 
-        private static void ConfigureCalf(GameObject calf, GameObject cow, CowSettings settings)
+        /// <summary>A calf grows into a cow, or with the bull chance into Momo.</summary>
+        private static void SetGrowup(Growup growup, GameObject cow, GameObject bull, CowSettings settings)
+        {
+            growup.m_grownPrefab = cow;
+            growup.m_growTime = settings.GrowSeconds;
+            float chance = Mathf.Clamp(settings.BullChance, 0f, 100f);
+            growup.m_altGrownPrefabs = bull != null && chance > 0f
+                ? new List<Growup.GrownEntry>
+                {
+                    new Growup.GrownEntry { m_prefab = cow, m_weight = 100f - chance },
+                    new Growup.GrownEntry { m_prefab = bull, m_weight = chance },
+                }
+                : new List<Growup.GrownEntry>();
+        }
+
+        private static void ConfigureCalf(GameObject calf, GameObject cow, GameObject bull, CowSettings settings)
         {
             calf.transform.localScale = Vector3.one * (settings.Scale * 0.75f);
 
@@ -351,10 +377,7 @@ namespace VerlerLeben
             character.m_name = "$df_kalb";
             character.m_group = "df_cow";
 
-            var growup = calf.GetComponent<Growup>();
-            growup.m_grownPrefab = cow;
-            growup.m_altGrownPrefabs = new List<Growup.GrownEntry>();
-            growup.m_growTime = settings.GrowSeconds;
+            SetGrowup(calf.GetComponent<Growup>(), cow, bull, settings);
         }
 
         // ---- looks: smooth short coat in white with black patches instead of the shaggy Lox fur
@@ -502,7 +525,7 @@ namespace VerlerLeben
         public int BreedLimit;                // cows and calves within 10 m before breeding stops; 0 = no limit
         public float BreedChance = 50f;       // percent per attempt, one attempt every 10 s
         public float Scale = 0.65f;
-        public float Health = 150f;
+        public float Health = 250f;
         public float TamingSeconds = 300f;
         public float FedSeconds = 900f;
         public float GrowSeconds = 1200f;
@@ -510,6 +533,11 @@ namespace VerlerLeben
         public KeyCode MilkKey = KeyCode.H;
         public int MilkMin = 1;
         public int MilkMax = 2;
+        public float BullChance = 25f;         // percent of the calves that grow into Momo
+        public float BullHealth = 1200f;       // a Lox: 1000
+        public float BullScale = 0.9f;
+        public float BullDamage = 1.5f;        // times what a Lox hits for
+        public float BullGuardRange = 40f;     // how far Momo sees a monster coming (a Lox: 25)
 
         public void Bind(BepInEx.Configuration.ConfigFile config)
         {
@@ -535,6 +563,16 @@ namespace VerlerLeben
                 "Key to milk the cow you look at. E makes her follow you or wait, like a wolf. Not used by the game: H, Y, U, J, N.").Value;
             MilkMin = config.Bind(s, "MilkMin", MilkMin, ServerSync.Desc("Least milk per milking.")).Value;
             MilkMax = config.Bind(s, "MilkMax", MilkMax, ServerSync.Desc("Most milk per milking.")).Value;
+
+            const string b = "Bull";
+            BullChance = config.Bind(b, "BullChancePercent", BullChance,
+                ServerSync.Desc("Chance that a calf grows into Momo, the bull, instead of a cow, in percent. 0 = no bulls.")).Value;
+            BullHealth = config.Bind(b, "Health", BullHealth, ServerSync.Desc("Health of Momo (a Lox: 1000).")).Value;
+            BullScale = config.Bind(b, "Scale", BullScale, ServerSync.Desc("Size of Momo compared to a Lox.")).Value;
+            BullDamage = config.Bind(b, "DamageMultiplier", BullDamage,
+                ServerSync.Desc("Momo hits like a Lox times this. He only fights monsters, or a player who attacked him first.")).Value;
+            BullGuardRange = config.Bind(b, "GuardRangeMetres", BullGuardRange,
+                ServerSync.Desc("How far away Momo notices a monster that comes near the herd (a Lox: 25).")).Value;
         }
     }
 

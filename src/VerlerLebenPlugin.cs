@@ -23,7 +23,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.4.2";
+        public const string PluginVersion = "1.5.0";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -249,6 +249,7 @@ namespace VerlerLeben
                 { "item_df_rindfleisch_desc", "Raw beef from a cow. The base of Döner meat." },
                 { "df_kuh", "Cow" },
                 { "df_kalb", "Calf" },
+                { "df_bulle", "Momo" },
                 { "df_milk_action", "Milk" },
                 { "df_cow_follow", "Follow / Wait" },
                 { "df_cow_ready", "Milk ready" },
@@ -293,6 +294,7 @@ namespace VerlerLeben
                 { "item_df_rindfleisch_desc", "Rohes Rindfleisch von der Kuh. Die Grundlage fürs Dönerfleisch." },
                 { "df_kuh", "Kuh" },
                 { "df_kalb", "Kalb" },
+                { "df_bulle", "Momo" },
                 { "df_milk_action", "Melken" },
                 { "df_cow_follow", "Folgen / Warten" },
                 { "df_cow_ready", "Milch bereit" },
