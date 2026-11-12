@@ -23,7 +23,7 @@ namespace VerlerLeben
         public const string PluginGUID = "felix.verlerleben";
         public const string PluginName = "Verler Leben";
         // Keep in sync with <Version> in VerlerLeben.csproj.
-        public const string PluginVersion = "1.5.1";
+        public const string PluginVersion = "1.6.0";
 
         // The piece table of the Feaster tool, the one the vanilla biome feasts are in.
         private const string FeasterTable = "_FeasterPieceTable";
@@ -44,6 +44,12 @@ namespace VerlerLeben
                 Ingredients = "DF_Milch:2", Amount = 3,
                 Health = 30f, Stamina = 40f, Regen = 2f, BurnSeconds = 1200f,
             },
+            new Ingredient
+            {
+                Key = "Butter", PrefabName = "DF_Butter", BasePrefab = "BreadDough",
+                // Churned from milk; an ingredient only.
+                Ingredients = "DF_Milch:3", Amount = 2, Weight = 0.4f,
+            },
         };
 
         // Dropped by the cow or made from her: milk and beef.
@@ -53,6 +59,12 @@ namespace VerlerLeben
             {
                 Key = "Milch", PrefabName = "DF_Milch", BasePrefab = "MeadStaminaMinor", Weight = 0.5f, StackSize = 20,
                 Health = 12f, Stamina = 30f, Regen = 1f, BurnSeconds = 600f,
+            },
+            // Ripens in the fermenter from cheese; not crafted.
+            new DropItem
+            {
+                Key = "KaeseGereift", PrefabName = "DF_KaeseGereift", BasePrefab = "BreadDough", Weight = 0.5f, StackSize = 30,
+                Health = 48f, Stamina = 64f, Regen = 3f, BurnSeconds = 1800f,
             },
             new DropItem { Key = "Rindfleisch", PrefabName = "DF_Rindfleisch", BasePrefab = "LoxMeat", Weight = 0.5f, StackSize = 30 },
         };
@@ -97,6 +109,19 @@ namespace VerlerLeben
                 Ingredients = "BreadDough:1,Honey:1,Raspberry:2", Amount = 2,
                 Health = 15f, Stamina = 20f, Eitr = 45f, Regen = 1f, BurnSeconds = 900f,
             },
+            new Snack
+            {
+                Key = "Butterbrot", PrefabName = "DF_Butterbrot", BasePrefab = "Bread",
+                CraftingStation = nameof(CraftingStations.FoodPreparationTable),
+                Ingredients = "Bread:1,DF_Butter:1", Amount = 1,
+                Health = 28f, Stamina = 46f, Regen = 2f, BurnSeconds = 1200f,
+            },
+            new Snack
+            {
+                Key = "Milchbrei", PrefabName = "DF_Milchbrei", BasePrefab = "QueensJam",
+                Ingredients = "BarleyFlour:2,DF_Milch:2,DF_Butter:1,Honey:1", Amount = 2,
+                Health = 50f, Stamina = 36f, Regen = 3f, BurnSeconds = 1500f,
+            },
         };
 
         // What was added, so changed values (e.g. from the server) can be applied in place.
@@ -111,6 +136,7 @@ namespace VerlerLeben
             ServerSync.Log = Logger;
             int storedConfigVersion = ConfigMigration.ReadStoredVersion(Config);
             BindAll();
+            Screens.Bind(Config, Logger);
 
             SE_Boonekamp.FeastFoods.AddRange(new[] { "$item_df_teller", "$item_df_pizza", "$item_df_manta" });
             new Harmony(PluginGUID).PatchAll(typeof(VerlerLebenPlugin).Assembly);
@@ -223,6 +249,13 @@ namespace VerlerLeben
                 ServerSync.SetWord($"item_{dish.Token}_desc", DishDescription(dish, ServerSync.German));
             }
 
+            Fermenter fermenter = PrefabManager.Instance.GetPrefab("fermenter")?.GetComponent<Fermenter>();
+            Fermenter.ItemConversion ripening = fermenter?.m_conversion.Find(c => c.m_from != null && c.m_from.name == "DF_Kaese");
+            if (ripening != null)
+            {
+                ripening.m_producedItems = Mathf.Max(1, _cow.RipenYield);
+            }
+
             Cows.Apply(_cow);
         }
 
@@ -266,6 +299,15 @@ namespace VerlerLeben
                 { "item_df_doener_desc", "Thin slices of beef and lox meat from the spit. Tastes good on its own and is the base of every good feast." },
                 { "item_df_kaese", "Cheese" },
                 { "item_df_kaese_desc", "Cheese from the milk of the cow. A small snack, and it melts beautifully on a feast." },
+                { "item_df_butter", "Butter" },
+                { "item_df_butter_desc", "Churned from the milk of the cow. Goes on bread and into porridge." },
+                { "item_df_kaesegereift", "Aged Cheese" },
+                { "item_df_kaesegereift_desc", "Cheese that ripened in the fermenter. Stronger and more filling than fresh cheese." },
+                { "item_df_butterbrot", "Bread and Butter" },
+                { "item_df_butterbrot_desc", "A slice of bread with a thick layer of butter and chives. Quick and filling." },
+                { "item_df_milchbrei", "Milk Porridge" },
+                { "item_df_milchbrei_desc", "Warm barley porridge with milk, butter, honey and cinnamon. Health, stamina and a calm stomach." },
+                { "df_cow_happy", "Content" },
 
                 { "item_df_teller_raw", "Kaunitzer Plate (raw)" },
                 { "item_df_teller_raw_desc", "Döner and fries in an aluminium tray, covered in cheese. Needs to be baked in the stone oven." },
@@ -311,6 +353,15 @@ namespace VerlerLeben
                 { "item_df_doener_desc", "Dünne Scheiben Rind- und Loxfleisch vom Spieß. Schmeckt auch pur und ist die Grundlage jedes guten Festmahls." },
                 { "item_df_kaese", "Käse" },
                 { "item_df_kaese_desc", "Käse aus der Milch der Kuh. Ein kleiner Snack, und er schmilzt wunderbar auf jedem Festmahl." },
+                { "item_df_butter", "Butter" },
+                { "item_df_butter_desc", "Aus der Milch der Kuh gerührt. Gehört aufs Brot und in den Brei." },
+                { "item_df_kaesegereift", "Gereifter Käse" },
+                { "item_df_kaesegereift_desc", "Käse, der im Fermenter gereift ist. Kräftiger und sättigender als frischer Käse." },
+                { "item_df_butterbrot", "Butterbrot" },
+                { "item_df_butterbrot_desc", "Eine Scheibe Brot mit dicker Butter und Schnittlauch. Schnell gemacht und sättigend." },
+                { "item_df_milchbrei", "Milchbrei" },
+                { "item_df_milchbrei_desc", "Warmer Gerstenbrei mit Milch, Butter, Honig und Zimt. Leben, Ausdauer und ein ruhiger Magen." },
+                { "df_cow_happy", "Zufrieden" },
 
                 { "item_df_teller_raw", "Kaunitzer Teller (roh)" },
                 { "item_df_teller_raw_desc", "Döner und Pommes in der Aluschale, dick mit Käse bedeckt. Muss im Steinofen gebacken werden." },
@@ -378,6 +429,14 @@ namespace VerlerLeben
                 {
                     AddDropItem(drop);
                 }
+
+                // Cheese ripens in the fermenter, as long as mead does.
+                ItemManager.Instance.AddItemConversion(new CustomItemConversion(new FermenterConversionConfig
+                {
+                    FromItem = "DF_Kaese",
+                    ToItem = "DF_KaeseGereift",
+                    ProducedItems = Mathf.Max(1, _cow.RipenYield),
+                }));
 
                 Cows.Add(_cow, Logger);
             }

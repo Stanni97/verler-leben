@@ -28,9 +28,9 @@ Zum Vergleich: das Feast der Ebenen gibt 55 Leben und 55 Ausdauer für 50 Minute
 In den **Ebenen** laufen jetzt Kühe herum, dort wachsen auch Gerste und Flachs, ihr Futter, schwarzbunt, rotbunt oder braun. Sie bewegen sich mit den Animationen des Lox, sehen aber aus wie Kühe. Sie sind harmlos: Sie greifen niemanden an und machen keinen Zaun kaputt, ein einfacher Holzzaun reicht.
 
 - **Zähmen:** Wirf Gerste oder Flachs in ihre Nähe und halte Abstand. Nach etwa 5 Minuten ist sie zahm (ein Lox braucht 30).
-- **Folgen:** Mit **E** sagst du einer zahmen Kuh, dass sie dir folgen oder warten soll, wie bei einem Wolf.
-- **Melken:** Mit **H** melkst du die zahme, satte Kuh, die du ansiehst (die Taste ist in der Config einstellbar). Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch.
-- **Züchten:** Zwei zahme Kühe, regelmäßig gefüttert und nahe beieinander, bekommen Kälber. Das Kalb wächst nach etwa 20 Minuten heran.
+- **Folgen und Streicheln:** Mit **E** sagst du einer zahmen Kuh, dass sie dir folgen oder warten soll, wie bei einem Wolf. Dabei streichelst du sie: Sie ist dann 15 Minuten zufrieden (steht beim Hinschauen dabei) und gibt beim Melken 1 Milch mehr.
+- **Melken:** Mit **H** melkst du die zahme, satte Kuh, die du ansiehst (die Taste ist in der Config einstellbar). Du bekommst 1 bis 2 Milch, danach ist sie einen Tag lang leer. Hat sie Hunger, gibt sie keine Milch. War ihre letzte Mahlzeit noch nicht lange her (in der ersten Hälfte der Sattzeit), gibt sie 1 Milch mehr. Beide Boni lassen sich in der Config ändern.
+- **Züchten:** Zwei zahme Kühe, regelmäßig gefüttert und nahe beieinander, bekommen Kälber. Das Kalb wächst nach etwa 20 Minuten heran, in der Nähe von Momo (20 m) um die Hälfte schneller.
 - **Schlachten:** Sie droppt 2 bis 3 Rindfleisch und etwas Lederreste.
 - **Laute:** Die Kühe muhen (auch beim Treffer und Sterben), das Kalb ruft hell, Momo brüllt tief. Die Laute sind immer an (jeder Spieler mit der Mod hört sie, der Server spielt keine Töne ab).
 
@@ -44,6 +44,7 @@ Manche Kälber (Standard 25 %) werden keine Kuh, sondern **Momo**: ein Bulle mit
 - **Friedlich zu Spielern:** Momo ist von Geburt an zahm und tut dir nichts, außer du schlägst ihn. Dann wehrt er sich eine halbe Minute lang. Harmlose Tiere wie Rehe und Wildschweine lässt er in Ruhe.
 - **Nicht melkbar**, dafür gibt er beim Schlachten mehr: 4 bis 6 Rindfleisch und 2 bis 3 Lederreste. Er züchtet nicht selbst, das machen die Kühe.
 - Er frisst wie die Kühe Gerste und Flachs, auch vom Boden.
+- **Herdenvater:** Kälber in seiner Nähe wachsen um 50 % schneller heran (`CalfGrowthBonusPercent`, `CalfGrowthRangeMetres` in `[Bull]`).
 
 ## Herstellung
 
@@ -55,6 +56,11 @@ Manche Kälber (Standard 25 %) werden keine Kuh, sondern **Momo**: ein Bulle mit
    | Rindfleisch | von der Kuh | |
    | Dönerfleisch | 1 Rindfleisch, 1 gebratenes Loxfleisch, 1 Berg-Gewürz | 3 |
    | Käse | 2 Milch | 3 |
+   | Butter | 3 Milch | 2 |
+   | Butterbrot | 1 Brot, 1 Butter | 1 |
+   | Milchbrei (am Kessel) | 2 Gerstenmehl, 2 Milch, 1 Butter, 1 Honig | 2 |
+
+   **Gereifter Käse:** Lege Käse in den Fermenter (die Tonne, in der der Met entsteht). Er reift so lange wie Met und wird zu 2 gereiftem Käse, der kräftiger und sättigender ist als frischer (`RipenedPerCheese` im Abschnitt `[Kaese]`). Das Rezept für die Feste bleibt beim frischen Käse.
 
 2. **Rohes Gericht** am Essenszubereitungstisch herstellen:
 
@@ -164,7 +170,7 @@ Die Abschnitte `[Teller]`, `[Pizza]` und `[Manta]` (die Feasts):
 | `DurationSeconds` | Wie lange das Essen wirkt |
 | `Servings` | Portionen pro Feast |
 
-Die Abschnitte `[Doener]` und `[Kaese]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`. Beide sind auch einzeln essbar (`Health`, `Stamina`, `HealthRegen`, `DurationSeconds`; Leben und Ausdauer auf 0 macht sie wieder ungenießbar). Dasselbe gilt für die Milch im Abschnitt `[Milch]`. Rindfleisch ist roh und nicht essbar.
+Die Abschnitte `[Doener]`, `[Kaese]` und `[Butter]` (die Zutaten) kennen `Enabled`, `CraftingStation`, `Ingredients` und `Amount`. Beide sind auch einzeln essbar (`Health`, `Stamina`, `HealthRegen`, `DurationSeconds`; Leben und Ausdauer auf 0 macht sie wieder ungenießbar). Dasselbe gilt für die Milch im Abschnitt `[Milch]`. Rindfleisch ist roh und nicht essbar.
 
 Der Abschnitt `[Boonekamp]` hat zusätzlich `DurationSeconds`, `HealthRegenBonusPercent`, `StaminaRegenBonusPercent` sowie die Zusatzboni `FeastExtra…`, `MeadExtra…` und `BeerExtra…` (je für Leben und Ausdauer) für Feast, Met und Gerstenwein.
 

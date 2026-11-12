@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0
+
+- **Momo als Herdenvater:** Kälber, die nicht weiter als 20 m von Momo entfernt sind, wachsen um 50 % schneller heran (`[Bull] CalfGrowthBonusPercent`, `CalfGrowthRangeMetres`).
+- **Kuh-Pflege:** Streichelst du eine zahme Kuh mit E, ist sie 15 Minuten zufrieden und gibt beim Melken 1 Milch mehr (`[Cow] PetMilkBonus`, `PetMemorySeconds`). Auch eine Kuh, die vor kurzem gefressen hat (in der ersten Hälfte der Sattzeit), gibt 1 Milch mehr (`WellFedMilkBonus`, `WellFedPercent`).
+- **Butter, Butterbrot und Milchbrei:** Neue Gerichte aus Milch. Butter (3 Milch, ergibt 2) ist eine Zutat; Butterbrot (Brot und Butter) und Milchbrei (Gerstenmehl, Milch, Butter, Honig) sind Essen.
+- **Gereifter Käse:** Käse im Fermenter reift (so lange wie Met) zu 2 gereiftem Käse mit besseren Werten (`[Kaese] RipenedPerCheese`).
+- **Hauptmenü:** Auf dem Hauptmenü steht ein Bild von Momo (nur im eigenen Spiel, abschaltbar mit `[Screens] MenuBackground`).
+
 ## 1.5.1
 
 - **Echte Kuh-Laute:** Die selbst erzeugten Klänge von 1.5.0 sind ersetzt durch echte Kuh-Aufnahmen von Wikimedia Commons ("Single Cow Moo" von MichaeltheFox8621, CC BY-SA 4.0, und "Mudchute cow 1" von Secretlondon, CC BY-SA 3.0), geschnitten und in der Tonhöhe verändert: höher fürs Kalb, tiefer für Momo. Die Quellen stehen im README unter "Credits".

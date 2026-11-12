@@ -15,6 +15,52 @@ namespace VerlerLeben
     {
     }
 
+    /// <summary>A calf close to Momo grows up faster: its birth time moves back a little every few seconds.</summary>
+    internal class DfCalf : MonoBehaviour
+    {
+        private const float Interval = 10f;
+        private ZNetView _nview;
+
+        private void Start()
+        {
+            _nview = GetComponent<ZNetView>();
+            InvokeRepeating(nameof(Tick), UnityEngine.Random.Range(5f, 10f), Interval);
+        }
+
+        private void Tick()
+        {
+            CowSettings settings = Cows.Settings;
+            if (settings == null || settings.CalfGrowthBonus <= 0f || _nview == null || !_nview.IsValid() || !_nview.IsOwner()
+                || Bulls.Living.Count == 0)
+            {
+                return;
+            }
+
+            float range = Mathf.Max(1f, settings.CalfGrowthRange);
+            bool near = false;
+            foreach (Character bull in Bulls.Living)
+            {
+                if (bull != null && !bull.IsDead() && Vector3.Distance(bull.transform.position, transform.position) <= range)
+                {
+                    near = true;
+                    break;
+                }
+            }
+
+            if (!near)
+            {
+                return;
+            }
+
+            ZDO zdo = _nview.GetZDO();
+            long born = zdo.GetLong(ZDOVars.s_spawnTime, 0L);
+            if (born > 0L)
+            {
+                zdo.Set(ZDOVars.s_spawnTime, born - (long)(Interval * settings.CalfGrowthBonus / 100f * TimeSpan.TicksPerSecond));
+            }
+        }
+    }
+
     /// <summary>Feeding behaviour shared by cows and bulls.</summary>
     internal class DfFeeder : MonoBehaviour
     {
@@ -381,6 +427,10 @@ namespace VerlerLeben
             character.m_group = "df_cow";
 
             SetGrowup(calf.GetComponent<Growup>(), cow, bull, settings);
+            if (calf.GetComponent<DfCalf>() == null)
+            {
+                calf.AddComponent<DfCalf>();
+            }
         }
 
         // ---- looks: smooth short coat in white with black patches instead of the shaggy Lox fur
@@ -536,6 +586,13 @@ namespace VerlerLeben
         public KeyCode MilkKey = KeyCode.H;
         public int MilkMin = 1;
         public int MilkMax = 2;
+        public int PetMilkBonus = 1;           // extra milk when the cow was petted lately
+        public float PetMemorySeconds = 900f;  // how long a petting counts
+        public int WellFedMilkBonus = 1;       // extra milk when she was fed lately
+        public float WellFedPercent = 50f;     // "lately" = within this share of FedSeconds
+        public int RipenYield = 2;             // aged cheese per cheese in the fermenter
+        public float CalfGrowthBonus = 50f;    // percent faster growth of calves close to Momo
+        public float CalfGrowthRange = 20f;    // how close, in metres
         public bool Sounds = true;             // moos instead of the Lox's grunts; always on, there is no option
         public float BullChance = 25f;         // percent of the calves that grow into Momo
         public float BullHealth = 1200f;       // a Lox: 1000
@@ -568,6 +625,17 @@ namespace VerlerLeben
             MilkMin = config.Bind(s, "MilkMin", MilkMin, ServerSync.Desc("Least milk per milking.")).Value;
             MilkMax = config.Bind(s, "MilkMax", MilkMax, ServerSync.Desc("Most milk per milking.")).Value;
 
+            PetMilkBonus = config.Bind(s, "PetMilkBonus", PetMilkBonus,
+                ServerSync.Desc("Extra milk when you petted the cow (E) shortly before milking. 0 = no bonus.")).Value;
+            PetMemorySeconds = config.Bind(s, "PetMemorySeconds", PetMemorySeconds,
+                ServerSync.Desc("How long after petting the cow counts as content, in seconds.")).Value;
+            WellFedMilkBonus = config.Bind(s, "WellFedMilkBonus", WellFedMilkBonus,
+                ServerSync.Desc("Extra milk when the cow was fed recently. 0 = no bonus.")).Value;
+            WellFedPercent = config.Bind(s, "WellFedPercent", WellFedPercent,
+                ServerSync.Desc("A cow counts as well fed within this share of FedSeconds after her last meal, in percent.")).Value;
+            RipenYield = config.Bind("Kaese", "RipenedPerCheese", RipenYield,
+                ServerSync.Desc("Aged cheese that one cheese turns into in the fermenter (it ripens as long as mead does).")).Value;
+
             const string b = "Bull";
             BullChance = config.Bind(b, "BullChancePercent", BullChance,
                 ServerSync.Desc("Chance that a calf grows into Momo, the bull, instead of a cow, in percent. 0 = no bulls.")).Value;
@@ -575,6 +643,10 @@ namespace VerlerLeben
             BullScale = config.Bind(b, "Scale", BullScale, ServerSync.Desc("Size of Momo compared to a Lox.")).Value;
             BullDamage = config.Bind(b, "DamageMultiplier", BullDamage,
                 ServerSync.Desc("Momo hits like a Lox times this. He only fights monsters, or a player who attacked him first.")).Value;
+            CalfGrowthBonus = config.Bind(b, "CalfGrowthBonusPercent", CalfGrowthBonus,
+                ServerSync.Desc("Calves close to Momo grow up this much faster, in percent. 0 = no effect.")).Value;
+            CalfGrowthRange = config.Bind(b, "CalfGrowthRangeMetres", CalfGrowthRange,
+                ServerSync.Desc("How close a calf has to be to Momo for that.")).Value;
             BullGuardRange = config.Bind(b, "GuardRangeMetres", BullGuardRange,
                 ServerSync.Desc("How far away Momo notices a monster that comes near the herd (a Lox: 25).")).Value;
         }
@@ -635,9 +707,38 @@ namespace VerlerLeben
                 return;
             }
 
+            amount += Math.Max(0, Cows.Settings.PetMilkBonus) * (Petted(nview) ? 1 : 0);
+            amount += Math.Max(0, Cows.Settings.WellFedMilkBonus) * (WellFed(nview) ? 1 : 0);
+
             nview.ClaimOwnership();
             nview.GetZDO().Set(LastMilkKey, ZNet.instance.GetTime().Ticks);
             Give(user, amount);
+        }
+
+        private const string LastPetKey = "DF_lastPet";
+
+        /// <summary>The cow was petted (E) within the last PetMemorySeconds.</summary>
+        internal static bool Petted(ZNetView nview)
+        {
+            long last = nview.GetZDO().GetLong(LastPetKey, 0L);
+            return last != 0L && (ZNet.instance.GetTime() - new DateTime(last)).TotalSeconds <= Cows.Settings.PetMemorySeconds;
+        }
+
+        /// <summary>The cow ate within the first WellFedPercent of the time a meal lasts.</summary>
+        internal static bool WellFed(ZNetView nview)
+        {
+            long last = nview.GetZDO().GetLong(ZDOVars.s_tameLastFeeding, 0L);
+            double limit = Cows.Settings.FedSeconds * Mathf.Clamp(Cows.Settings.WellFedPercent, 0f, 100f) / 100f;
+            return last != 0L && (ZNet.instance.GetTime() - new DateTime(last)).TotalSeconds <= limit;
+        }
+
+        internal static void RememberPet(ZNetView nview)
+        {
+            if (nview != null && nview.IsValid())
+            {
+                nview.ClaimOwnership();
+                nview.GetZDO().Set(LastPetKey, ZNet.instance.GetTime().Ticks);
+            }
         }
 
         internal static bool MilkReady(ZNetView nview)
@@ -718,7 +819,31 @@ namespace VerlerLeben
             Localization loc = Localization.instance;
             __result = __result.Replace(loc.Localize("$hud_pet"), loc.Localize("$df_cow_follow"));
             string status = Milking.MilkReady(nview) ? "$df_cow_ready" : "$df_cow_done_short";
+            if (Milking.Petted(nview))
+            {
+                status += ", $df_cow_happy";
+            }
             __result += loc.Localize("\n[<color=yellow><b>" + Cows.Settings.MilkKey + "</b></color>] $df_milk_action <color=#bbbbbb>(" + status + ")</color>");
+        }
+    }
+
+    /// <summary>Petting a tame cow (E) makes her content for a while, which gives a little more milk.</summary>
+    [HarmonyPatch(typeof(Tameable), nameof(Tameable.Interact))]
+    internal static class CowPetting
+    {
+        [HarmonyPostfix]
+        private static void Postfix(Tameable __instance, bool hold, bool alt, bool __result)
+        {
+            if (!__result || hold || alt || Cows.Settings == null || __instance.GetComponent<DfCow>() == null)
+            {
+                return;
+            }
+
+            var character = __instance.GetComponent<Character>();
+            if (character != null && character.IsTamed())
+            {
+                Milking.RememberPet(__instance.GetComponent<ZNetView>());
+            }
         }
     }
 }

@@ -532,6 +532,76 @@ def draw_entenbox():
     return shade(layer, 0.2)
 
 
+def draw_butter():
+    """A block of butter, partly unwrapped from foil."""
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    d.polygon([(90, 270), (360, 190), (440, 250), (170, 340)], fill=(255, 238, 140, 255))               # top
+    d.polygon([(90, 270), (170, 340), (170, 430), (90, 360)], fill=(238, 206, 96, 255))                 # left
+    d.polygon([(170, 340), (440, 250), (440, 340), (170, 430)], fill=(250, 222, 112, 255))              # front
+    d.polygon([(250, 312), (440, 250), (440, 340), (250, 405)], fill=(196, 200, 210, 255))              # foil wrap
+    d.polygon([(250, 312), (270, 300), (440, 244), (440, 250)], fill=(232, 236, 244, 255))
+    d.line([(90, 270), (360, 190), (440, 250)], fill=(255, 250, 200, 255), width=6)
+    d.line([(150, 285), (300, 240)], fill=(226, 190, 80, 255), width=5)                                 # knife mark
+    return shade(layer, 0.2)
+
+
+def draw_butterbrot():
+    """A slice of bread with butter and a pinch of chives."""
+    rng = random.Random(61)
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    crust = [(110, 380), (110, 230), (140, 160), (210, 120), (300, 130), (330, 100), (410, 110), (440, 170), (430, 250), (420, 380), (380, 420), (150, 420)]
+    d.polygon(crust, fill=(160, 100, 46, 255))
+    inner = [(132, 372), (132, 236), (156, 178), (216, 142), (302, 152), (332, 124), (396, 132), (418, 178), (410, 252), (402, 372), (372, 398), (160, 398)]
+    d.polygon(inner, fill=(236, 196, 130, 255))
+    butter = new_layer()
+    bd = ImageDraw.Draw(butter)
+    blob(bd, 275, 268, 120, 92, (255, 232, 120, 255), rng, jitter=0.18)
+    blob(bd, 250, 250, 70, 50, (255, 244, 170, 255), rng, jitter=0.2)
+    layer.alpha_composite(butter)
+    for _ in range(18):
+        x, y = rng.randint(190, 360), rng.randint(210, 330)
+        a = rng.uniform(0, math.tau)
+        d.line([(x, y), (x + math.cos(a) * 18, y + math.sin(a) * 18)], fill=(70, 150, 60, 255), width=6)
+    return shade(layer, 0.22)
+
+
+def draw_milchbrei():
+    """A bowl of milk porridge with cinnamon and a dab of butter."""
+    rng = random.Random(71)
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    d.pieslice([70, 160, 442, 440], 0, 180, fill=(70, 118, 190, 255), outline=(36, 62, 120, 255), width=6)   # bowl
+    d.rectangle([160, 372, 352, 382], fill=(244, 244, 244, 255))
+    d.ellipse([70, 250, 442, 350], fill=(250, 246, 232, 255), outline=(36, 62, 120, 255), width=6)            # rim
+    d.ellipse([92, 264, 420, 336], fill=(248, 238, 214, 255))                                                 # porridge
+    for _ in range(120):
+        x, y = rng.randint(130, 380), rng.randint(270, 332)
+        if ((x - 256) / 150) ** 2 + ((y - 300) / 30) ** 2 < 1:
+            d.ellipse([x - 3, y - 2, x + 3, y + 2], fill=(150, 88, 40, 255))                                  # cinnamon
+    d.ellipse([226, 282, 292, 316], fill=(255, 232, 120, 255))                                                # butter
+    return shade(layer, 0.18)
+
+
+def draw_kaese_gereift():
+    """A wheel of aged cheese with a dark rind and one wedge cut out."""
+    rng = random.Random(81)
+    layer = new_layer()
+    d = ImageDraw.Draw(layer)
+    d.ellipse([60, 190, 452, 400], fill=(150, 88, 34, 255))                                              # underside of the rind
+    d.rectangle([60, 290, 452, 380], fill=(150, 88, 34, 255))
+    d.ellipse([60, 250, 452, 440], fill=(130, 74, 28, 255))
+    d.ellipse([60, 180, 452, 390], fill=(176, 108, 44, 255))                                             # top rind
+    d.ellipse([84, 196, 428, 372], fill=(232, 160, 60, 255))                                             # top face
+    d.polygon([(256, 284), (440, 230), (420, 330), (330, 372)], fill=(255, 208, 110, 255))               # cut wedge, lighter inside
+    d.polygon([(256, 284), (330, 372), (330, 418), (256, 330)], fill=(240, 186, 84, 255))
+    for cx, cy, r in ((350, 296, 12), (392, 280, 8), (318, 340, 9), (160, 268, 10), (230, 330, 8)):
+        d.ellipse([cx - r, cy - r * 0.7, cx + r, cy + r * 0.7], fill=(200, 130, 40, 255))
+    d.arc([84, 196, 428, 372], 200, 340, fill=(255, 220, 150, 255), width=5)
+    return shade(layer, 0.2)
+
+
 def finish(layer):
     """Dark outline and soft drop shadow, like vanilla Valheim icons."""
     alpha = layer.getchannel("A")
@@ -549,7 +619,8 @@ for name, layer in (("doener", draw_doener()), ("kaese", draw_kaese()),
                     ("teller", draw_tray(True)), ("tellerraw", draw_tray(False)),
                     ("pizza", draw_pizza(True)), ("pizzaraw", draw_pizza(False)),
                     ("milch", draw_milch()), ("rindfleisch", draw_rindfleisch()), ("boonekamp", draw_boonekamp()),
-                    ("manta", draw_manta(True)), ("mantaraw", draw_manta(False)), ("entenbox", draw_entenbox())):
+                    ("butter", draw_butter()), ("butterbrot", draw_butterbrot()), ("milchbrei", draw_milchbrei()),
+                    ("kaesegereift", draw_kaese_gereift()), ("manta", draw_manta(True)), ("mantaraw", draw_manta(False)), ("entenbox", draw_entenbox())):
     path = os.path.join(OUT_DIR, f"{name}.png")
     finish(layer).save(path)
     print("wrote", path)
